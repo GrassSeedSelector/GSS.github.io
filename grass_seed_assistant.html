@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Grass Should I Plant? — Virginia Lawn Seed Selector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f3f1e9; --card:#ffffff; --ink:#21302a; --slate:#52605a; --slate-light:#8a948e;
+    --green-deep:#2c5f3e; --green:#3d8b5f; --green-soft:#e7f1ea;
+    --gold:#b8862f; --gold-soft:#f8efda; --terracotta:#bb5a3c; --terra-soft:#f6e3da;
+    --sky:#33688f; --sky-soft:#e4eef5; --border:#e0ddd0; --rule:#cfd8d0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Newsreader',Georgia,serif;
+    font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 22px 90px;}
+
+  header.hero{padding:54px 0 30px; border-bottom:3px double var(--green-deep); margin-bottom:30px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.22em;
+    text-transform:uppercase; color:var(--green); margin:0 0 12px;}
+  h1{font-family:'Fraunces',serif; font-weight:600; font-size:clamp(1.9rem,5vw,2.9rem);
+    line-height:1.05; letter-spacing:-0.01em; margin:0 0 14px; color:var(--green-deep);}
+  .lede{font-size:1.1rem; color:var(--slate); margin:0; max-width:60ch;}
+
+  /* Progress */
+  .progress{display:flex; gap:6px; margin:0 0 26px;}
+  .pdot{height:5px; flex:1; border-radius:3px; background:var(--rule); transition:background .3s;}
+  .pdot.done{background:var(--green);}
+  .pdot.active{background:var(--gold);}
+
+  /* Question card */
+  .qcard{background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:26px 24px; margin-bottom:18px; box-shadow:0 1px 3px rgba(33,48,42,0.04);}
+  .qnum{font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.12em;
+    color:var(--green); margin-bottom:6px;}
+  .qtext{font-family:'Fraunces',serif; font-size:1.32rem; font-weight:600; color:var(--green-deep);
+    margin:0 0 4px; line-height:1.2;}
+  .qhint{font-size:0.9rem; color:var(--slate-light); margin:0 0 18px;}
+  .opts{display:grid; gap:10px;}
+  .opt{display:flex; align-items:center; gap:13px; width:100%; text-align:left; cursor:pointer;
+    background:var(--bg); border:1.5px solid var(--border); border-radius:10px; padding:14px 16px;
+    font-family:'Newsreader',serif; font-size:1rem; color:var(--ink); transition:all .15s;}
+  .opt:hover{border-color:var(--green); background:var(--green-soft);}
+  .opt:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+  .opt .emoji{font-size:1.3rem; flex-shrink:0; line-height:1;}
+  .opt .otext{flex:1;}
+  .opt .osub{display:block; font-size:0.82rem; color:var(--slate-light); margin-top:2px;}
+  .opt.selected{border-color:var(--green-deep); background:var(--green-soft); box-shadow:inset 0 0 0 1px var(--green-deep);}
+
+  /* region select */
+  .region-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:6px;}
+  select.region{font-family:'Newsreader',serif; font-size:1rem; padding:10px 14px;
+    border:1.5px solid var(--border); border-radius:9px; background:var(--card); color:var(--ink); flex:1; min-width:200px;}
+  .region-default{font-size:0.84rem; color:var(--green); font-family:'IBM Plex Mono',monospace;}
+
+  .backbtn{background:none; border:none; color:var(--slate-light); font-family:'IBM Plex Mono',monospace;
+    font-size:0.78rem; cursor:pointer; padding:8px 0; letter-spacing:0.05em;}
+  .backbtn:hover{color:var(--green-deep);}
+
+  /* Result */
+  .result-head{font-family:'Fraunces',serif; font-size:1.0rem; color:var(--green); margin:0 0 4px;
+    letter-spacing:0.02em; text-transform:uppercase; font-weight:600;}
+  .pick{font-family:'Fraunces',serif; font-size:2rem; font-weight:600; color:var(--green-deep);
+    line-height:1.1; margin:0 0 8px;}
+  .pick-why{font-size:1.05rem; color:var(--slate); margin:0 0 20px;}
+
+  .resblock{margin:0 0 18px;}
+  .resblock h3{font-family:'Fraunces',serif; font-size:1.12rem; color:var(--green-deep);
+    margin:0 0 8px; display:flex; align-items:center; gap:8px;}
+  .resblock h3 + .tbl-scroll{margin-top:0;}
+  .resblock p{margin:0 0 8px;}
+
+  .props{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin:4px 0;}
+  .prop{background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:9px 12px;}
+  .prop .pl{font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--slate-light);
+    font-family:'IBM Plex Mono',monospace;}
+  .prop .pv{font-size:0.95rem; color:var(--ink); font-weight:500;}
+
+  .checklist{list-style:none; padding:0; margin:8px 0;}
+  .checklist li{padding:6px 0 6px 26px; position:relative; font-size:0.95rem; color:var(--slate);
+    border-bottom:1px solid var(--border);}
+  .checklist li::before{content:"✓"; position:absolute; left:2px; top:6px; color:var(--green); font-weight:700;}
+  .checklist li.avoid::before{content:"✕"; color:var(--terracotta);}
+  .alt-steps{margin:8px 0; padding-left:22px;}
+  .alt-steps li{margin-bottom:8px; color:var(--slate); font-size:0.95rem; line-height:1.5;}
+  .alt-steps li strong{color:var(--ink);}
+
+  .note{border-radius:10px; padding:14px 16px; margin:16px 0; font-size:0.95rem; line-height:1.55;
+    border:1px solid var(--border); background:var(--card);}
+  .note .nt{font-weight:600; font-family:'Fraunces',serif; display:block; margin-bottom:3px;}
+  .note.gold{background:var(--gold-soft); border-color:#ecd9ad;} .note.gold .nt{color:#8a6418;}
+  .note.terra{background:var(--terra-soft); border-color:#eccabc;} .note.terra .nt{color:var(--terracotta);}
+  .note.green{background:var(--green-soft); border-color:#cfe3d6;} .note.green .nt{color:var(--green-deep);}
+  .note.sky{background:var(--sky-soft); border-color:#cbddeb;} .note.sky .nt{color:var(--sky);}
+
+  /* Diagnostic picker */
+  .tbl-scroll{overflow-x:auto; margin:10px 0;}
+  table{border-collapse:collapse; width:100%; font-family:'Newsreader',serif;}
+  th{color:#fff; font-weight:600; text-align:left; padding:8px 11px; font-size:0.8rem;}
+  td{padding:7px 11px; border-bottom:1px solid var(--border); color:var(--slate); vertical-align:top;}
+  tr:nth-child(even) td{background:#faf9f3;}
+  td strong{color:var(--ink);}
+  .diag-opts{display:grid; gap:7px; margin:14px 0 4px;}
+  .diag-opt{display:flex; align-items:center; gap:11px; width:100%; text-align:left; cursor:pointer;
+    background:#fff; border:1.5px solid #e6d6ad; border-radius:9px; padding:11px 14px;
+    font-family:'Newsreader',serif; font-size:0.95rem; color:var(--ink); transition:all .15s;}
+  .diag-opt:hover{border-color:var(--gold); background:#fdf8ec;}
+  .diag-opt:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+  .diag-opt.selected{border-color:#8a6418; background:#fbf1d8; box-shadow:inset 0 0 0 1px #8a6418;}
+  .diag-opt .emoji{font-size:1.15rem; flex-shrink:0;}
+  .diag-answer{margin-top:12px; padding:13px 15px; background:#fff; border:1px solid #e6d6ad;
+    border-radius:9px; font-size:0.94rem; line-height:1.5; color:var(--slate);}
+  .diag-answer strong{color:#8a6418;}
+  .diag-table{font-size:0.86rem;} .diag-table th{background:var(--gold); font-size:0.78rem;}
+  .diag-table td{vertical-align:top;}
+
+  /* Sample seed tag */
+  .tag-demo{margin-top:10px;}
+  .tag-demo summary{color:var(--green-deep); font-size:0.92rem; font-weight:600; margin-top:0;
+    background:var(--green-soft); border:1.5px solid #bcd9c6; border-radius:9px; padding:11px 15px;
+    cursor:pointer; list-style:none; display:flex; align-items:center; gap:8px; transition:all .15s;}
+  .tag-demo summary::-webkit-details-marker{display:none;}
+  .tag-demo summary::after{content:"▾"; margin-left:auto; color:var(--green); font-size:0.9rem;}
+  .tag-demo[open] summary::after{content:"▴";}
+  .tag-demo summary:hover{background:#dcebe1; border-color:var(--green);}
+  .seed-tag{border:2px solid #3a3a3a; border-radius:6px; background:#fffdf7; padding:0; margin:10px 0;
+    font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:#222; overflow:hidden;}
+  .st-brandline{background:#3a3a3a; color:#fdfbf3; padding:9px 12px; font-weight:500; font-size:0.82rem;
+    display:flex; flex-wrap:wrap; align-items:center; gap:8px;}
+  .st-section{padding:9px 12px; border-bottom:1px dashed #cbcbbf;}
+  .st-h{font-weight:500; color:#666; font-size:0.68rem; letter-spacing:0.04em; margin-bottom:5px;}
+  .st-row,.st-row2{display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:2px 0; line-height:1.5;}
+  .st-row span:nth-child(1){min-width:58px; font-weight:500;}
+  .st-row span:nth-child(2){min-width:42px; color:#555;}
+  .st-row span:nth-child(3){flex:0 1 auto;}
+  .st-row em{color:#888; font-style:italic; font-size:0.72rem;}
+  .st-row2 span:nth-child(1){min-width:118px; color:#666; font-size:0.72rem; letter-spacing:0.03em;}
+  .st-row2 span:nth-child(2){min-width:74px; font-weight:500;}
+  .st-foot{padding:9px 12px; font-size:0.7rem; color:#777; background:#f4f2e8;}
+  .st-anno{font-family:'Newsreader',serif; font-size:0.8rem; font-style:italic; color:var(--slate-light);}
+  .st-anno.good{color:var(--green);}
+  .st-anno.bad{color:var(--terracotta);}
+  .st-brandline .st-anno.good{color:#a8e6c0;}
+
+  .buy-amount{font-family:'Fraunces',serif; font-size:1.5rem; color:var(--green-deep); font-weight:600;}
+  .area-input{font-family:'Newsreader',serif; font-size:1rem; padding:8px 12px; width:130px;
+    border:1.5px solid var(--border); border-radius:8px; background:var(--card);}
+
+  .restart{display:inline-block; margin-top:10px; background:var(--green-deep); color:#f3f1e9;
+    border:none; border-radius:9px; padding:12px 22px; font-family:'IBM Plex Mono',monospace;
+    font-size:0.82rem; letter-spacing:0.05em; cursor:pointer;}
+  .restart:hover{background:var(--green);}
+  .result-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  .printbtn{display:inline-block; background:var(--gold); color:#fff; border:none; border-radius:9px;
+    padding:12px 22px; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; letter-spacing:0.05em; cursor:pointer;}
+  .printbtn:hover{background:#a0741f;}
+  .print-only{display:none;}
+  .print-header{font-family:'Fraunces',serif; font-weight:600; font-size:1.2rem; color:var(--green-deep);
+    border-bottom:2px solid var(--green-deep); padding-bottom:8px; margin-bottom:14px;}
+
+  @media print {
+    @page { margin: 1.2cm; }
+    body { background:#fff; color:#000; font-size:11pt; line-height:1.4; }
+    .wrap { max-width:100%; padding:0; }
+    header.hero, .progress, #quiz, #backwrap, .no-print, footer { display:none !important; }
+    #result { display:block !important; }
+    #result-card { border:none !important; box-shadow:none !important; padding:0 !important; margin:0 !important; }
+    .print-only { display:block; }
+    /* Let sections flow and break naturally — only keep small units intact to avoid stranded pages */
+    .resblock { margin:0 0 10px !important; }
+    .resblock h3 { margin:0 0 5px !important; }
+    .note { border:1px solid #bbb !important; background:#fff !important; margin:8px 0 !important; padding:8px 11px !important; break-inside:avoid; }
+    .props { gap:5px !important; margin:3px 0 !important; }
+    .prop { break-inside:avoid; padding:5px 9px !important; }
+    .checklist li { break-inside:avoid; padding:3px 0 3px 22px !important; }
+    .pick { color:#000 !important; font-size:1.5rem !important; margin:0 0 5px !important; }
+    .pick-why { margin:0 0 10px !important; }
+    .print-header { margin-bottom:8px !important; padding-bottom:5px !important; }
+    h3, .result-head, .pick, .print-header { color:#000 !important; }
+    a { color:#000; text-decoration:underline; }
+    details { display:block !important; }
+    details > summary { list-style:none; font-weight:600; }
+    details > *:not(summary) { display:block !important; }
+    .src { color:#333 !important; }
+    .diag-answer, .diag-opt { break-inside:avoid; }
+    /* On paper, the diagnostic picker buttons are clutter — keep only the answer the resident landed on */
+    .diag-opts { display:none !important; }
+    .diag-table { display:none; }
+    #diag-opts + #diag-result:empty { display:none; }
+  }
+
+  .src{font-size:0.82rem; color:var(--slate); font-style:italic; line-height:1.5;}
+  footer{padding-top:30px; margin-top:20px; border-top:1px solid var(--rule);
+    font-size:0.82rem; color:var(--slate-light);}
+  .hidden{display:none;}
+  details{margin:8px 0;} summary{cursor:pointer; color:var(--green); font-size:0.92rem;}
+  @media (max-width:560px){ body{font-size:16px;} header.hero{padding:38px 0 24px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">🌱 Virginia Cooperative Extension · Homeowner Tool</p>
+    <h1>Which grass should I plant?</h1>
+    <p class="lede">Answer a few questions about your site and how you'll use the lawn. You'll get a Virginia-adapted grass recommendation, what to look for on the seed bag at the store, and how much to buy — all from VCE turfgrass guidance.</p>
+  </header>
+
+  <div class="progress" id="progress"></div>
+
+  <div id="quiz"></div>
+  <div id="result" class="hidden"></div>
+  <div id="backwrap"></div>
+
+  <footer>
+    Built from VCE sources: SPES-748 "Selecting Turfgrass for Virginia," the Extension Master Gardener Handbook chapter 11, and the lawn maintenance calendars (430-520/522/523). Variety details: VCE SPES-617 (updated yearly). No brands endorsed — your seed bag's label is always the authority.
+    <br><br>During the preparation of this tool the author(s) used Claude (Anthropic) in order to assist with coding, content drafting, and structuring the interactive interface. After using this tool, the author(s) reviewed and edited the content as needed and take(s) full responsibility for the content of the publication.
+    <br><br>Virginia Cooperative Extension is a partnership of Virginia Tech, Virginia State University, the U.S. Department of Agriculture (USDA), and local governments, and is an equal opportunity employer. For the full nondiscrimination statement, please visit ext.vt.edu/accessibility.
+  </footer>
+
+</div>
+
+<script>
+// ============================================================
+//  GRASS SEED SELECTION — standalone tool
+// ============================================================
+
+// ---- Species property profiles (SPES-748) ----
+var SPECIES = {
+  ttf:   {name:'Turf-type tall fescue', season:'cool',
+          shade:'Moderate', traffic:'Good', drought:'Good (deep roots)', establish:'7-14 days',
+          winter:'Green year-round', texture:'Medium', maint:'Low-medium',
+          watch:'Brown patch in humid summers',
+          rateNew:[6,8], rateOver:[3,4], timing:'Late summer to mid-fall',
+          bag:'"Turf-Type Tall Fescue Blend"',
+          mixNote:'Buy a blend of 2-3+ named cultivars, not a single variety — diversity helps it survive Virginia\'s weather and pests.'},
+  ttf_kbg:{name:'Tall fescue + Kentucky bluegrass mix', season:'cool',
+          shade:'Moderate', traffic:'Excellent', drought:'Good', establish:'7-14 days',
+          winter:'Green year-round', texture:'Fine-medium', maint:'Medium-high',
+          watch:'Bluegrass needs sun and regular feeding',
+          rateNew:[6,8], rateOver:[3,4], timing:'Late summer to mid-fall',
+          bag:'"Sun & Shade Mix" or "Tall Fescue / Bluegrass Mix"',
+          mixNote:'The bluegrass knits the lawn together and repairs worn spots; it needs sun and inputs to hold its share.'},
+  fine:  {name:'Fine fescues', season:'cool',
+          shade:'Best of any cool-season', traffic:'Poor', drought:'Good (low-input)', establish:'Moderate',
+          winter:'Green year-round', texture:'Very fine, needle-like', maint:'Lowest',
+          watch:'Over 2 lb N/year causes problems; dislikes traffic and wet soil',
+          rateNew:[3,5], rateOver:[2,3], timing:'Late summer to mid-fall',
+          bag:'"Dense Shade" or "Heavy Shade Mix" (fine-fescue-heavy)',
+          mixNote:'Often sold in a sun/shade mix with bluegrass — over time fine fescue takes the shade and bluegrass takes the sun.'},
+  kbg:   {name:'Kentucky bluegrass', season:'cool',
+          shade:'Poor', traffic:'Excellent (self-repairs)', drought:'Survives via summer dormancy', establish:'Slow',
+          winter:'Green year-round', texture:'Fine-medium', maint:'High',
+          watch:'Not a shade grass; needs full sun and inputs',
+          rateNew:[1.5,2], rateOver:[1,1], timing:'Late summer to mid-fall',
+          bag:'"Kentucky Bluegrass Blend"',
+          mixNote:'Best as a showcase, full-sun lawn for an owner willing to mow, water, and feed regularly.'},
+  prg:   {name:'Perennial ryegrass', season:'cool',
+          shade:'Moderate', traffic:'Good', drought:'Moderate', establish:'Fastest (4-7 days)',
+          winter:'Green year-round', texture:'Fine-medium', maint:'Medium',
+          watch:'Rarely a standalone lawn in Virginia — best as a mix component',
+          rateNew:[5,7], rateOver:[3,4], timing:'Late summer to early fall',
+          bag:'"Perennial Ryegrass Blend" (or as part of a mix)',
+          mixNote:'Germinates fast, so it\'s used in mixes and for quick cover or winter overseeding of warm-season lawns.'},
+  zoysia:{name:'Zoysiagrass', season:'warm',
+          shade:'Moderate (best-shade warm-season)', traffic:'Excellent', drought:'Excellent', establish:'Slow',
+          winter:'Dormant tan 4-5 months', texture:'Fine-medium', maint:'Low-medium',
+          watch:'Slow and costly to establish; brown all winter',
+          rateNew:null, rateOver:null, timing:'Late spring to early summer',
+          bag:'"Zoysiagrass" seed (only some types are available as seed)',
+          mixNote:'Has the best cold tolerance of the warm-season grasses, but expect a long establishment and winter dormancy.'},
+  bermuda:{name:'Bermudagrass', season:'warm',
+          shade:'Poor (full sun only)', traffic:'Excellent', drought:'Excellent', establish:'Fast, aggressive',
+          winter:'Dormant tan 4-5 months', texture:'Fine-medium', maint:'Medium',
+          watch:'Can spread into beds as "wiregrass"; full sun only',
+          rateNew:null, rateOver:null, timing:'Late spring to early summer',
+          bag:'"Bermudagrass" seed (seeded types)',
+          mixNote:'Tough and drought-hardy in full sun, but aggressive — it will creep into flower beds.'},
+  centipede:{name:'Centipedegrass', season:'warm',
+          shade:'Moderate', traffic:'Low', drought:'Good', establish:'Slow',
+          winter:'Dormant tan', texture:'Medium', maint:'Lowest warm-season',
+          watch:'Very fertilizer-sensitive; only the southernmost counties',
+          rateNew:null, rateOver:null, timing:'Late spring to early summer',
+          bag:'"Centipedegrass" seed',
+          mixNote:'A genuine low-input grass for far southern Virginia — easy to over-fertilize, so go light.'},
+  staug: {name:'St. Augustinegrass', season:'warm',
+          shade:'Good (for a warm-season grass)', traffic:'Low-moderate', drought:'Moderate', establish:'No seed — sod or plugs',
+          winter:'Dormant tan', texture:'Coarse', maint:'Medium-high',
+          watch:'Highest pest pressure; far southeastern Virginia only; cannot be seeded',
+          rateNew:null, rateOver:null, timing:'Late spring to early summer (sod/plugs)',
+          bag:'Not sold as seed — buy sod or plugs',
+          mixNote:'The shade-tolerant warm-season choice for the coast, but you establish it from sod or plugs, never seed.'}
+};
+
+// ---- Regions ----
+var REGIONS = ['Northern Mountains','Southern Mountains','Northern Piedmont','Southern Piedmont','Coastal Plain'];
+
+// ---- Questions ----
+var QUESTIONS = [
+  {id:'project', q:'What\'s the project?', hint:'This sets your seeding rate and timing.',
+   opts:[
+     {v:'new', e:'🌱', t:'Starting a new lawn', s:'Bare soil or full renovation'},
+     {v:'overseed', e:'🔧', t:'Improving an existing lawn', s:'Thin, patchy, or weedy'},
+     {v:'patch', e:'🩹', t:'Patching small bare spots', s:'A few problem areas'},
+     {v:'alternative', e:'🌼', t:'Replacing lawn with a groundcover', s:'A lawn alternative for a tough or low-use area'}
+   ]},
+  {id:'region', q:'Where in Virginia is the lawn?', hint:'Defaults to Chesterfield County (Southern Piedmont).', type:'region'},
+  {id:'sun', q:'How much sun does the area get?', hint:'The single most important factor in choosing a grass.',
+   opts:[
+     {v:'full', e:'☀️', t:'Full sun', s:'6+ hours of direct sun'},
+     {v:'part', e:'⛅', t:'Part sun / part shade', s:'4-6 hours, or dappled light'},
+     {v:'shade', e:'🌳', t:'Mostly shade', s:'Under 4 hours of sun'},
+     {v:'mixed', e:'🧩', t:'Different areas differ', s:'Some sunny, some shaded'}
+   ]},
+  {id:'use', q:'How will the lawn be used?', hint:'Some grasses take foot traffic far better than others.',
+   opts:[
+     {v:'active', e:'🐕', t:'Active use', s:'Kids, dogs, recreation, gatherings'},
+     {v:'light', e:'🚶', t:'Light use', s:'Mostly for looks, occasional walking'},
+     {v:'lowinput', e:'🌿', t:'Low-input area', s:'Slope or back area — just hold the soil'}
+   ]},
+  {id:'look', q:'What look are you after?', hint:'Be honest — a showcase lawn is real work.',
+   opts:[
+     {v:'showcase', e:'✨', t:'Uniform showcase lawn', s:'Willing to maintain it'},
+     {v:'healthy', e:'👍', t:'Healthy and green is fine', s:'Some variation is OK'},
+     {v:'natural', e:'🍃', t:'Low-maintenance / naturalized', s:'Minimal inputs'}
+   ]},
+  {id:'maint', q:'How much maintenance will you really do?', hint:'Mowing, watering, feeding, weed control.',
+   opts:[
+     {v:'high', e:'🔁', t:'High', s:'Regular mow, water, feed, pest control'},
+     {v:'moderate', e:'⚖️', t:'Moderate', s:'Mow weekly in season, feed a few times'},
+     {v:'low', e:'🛟', t:'Low', s:'Mow when needed, little else'}
+   ]},
+  {id:'winter', q:'Is winter color important to you?', hint:'Warm-season grasses turn tan and dormant for 4-5 months.',
+   opts:[
+     {v:'green', e:'❄️', t:'Yes — I want green most of the year', s:'Points to cool-season grasses'},
+     {v:'dormant', e:'😴', t:'A tan, dormant lawn in winter is fine', s:'Opens up warm-season grasses'}
+   ]}
+];
+
+// ---- State ----
+var answers = {};
+var step = 0;
+
+// ---- Recommendation engine (SPES-748 logic) ----
+function recommend(a){
+  var warmRegion = (a.region === 'Southern Piedmont' || a.region === 'Coastal Plain' || a.region === 'Northern Piedmont');
+  var coastal = (a.region === 'Coastal Plain');
+  // Warm-season is on the table when winter dormancy is acceptable in an adapted region.
+  // Shade only stays on the warm path in the Coastal Plain, where St. Augustine (a shade-tolerant
+  // warm-season grass) is adapted; elsewhere a shaded lawn should be cool-season (fine fescue).
+  var wantsWarm = (a.winter === 'dormant') && warmRegion && (a.sun !== 'shade' || coastal);
+
+  // Warm-season path
+  if (wantsWarm) {
+    if (a.sun === 'shade' || a.sun === 'part') {
+      if (coastal) return {key:'staug', extra:'Among warm-season grasses, St. Augustine handles shade best — but only in far southeastern Virginia, and it must be established from sod or plugs, not seed.'};
+      return {key:'zoysia', extra:'Zoysiagrass is the most shade-tolerant warm-season grass that can sometimes be seeded, and it has the best cold tolerance for our region.'};
+    }
+    if (a.maint === 'low' && coastal) return {key:'centipede', extra:'In the warm southern counties, centipedegrass is the lowest-input warm-season lawn — just go very light on fertilizer.'};
+    if (a.use === 'active') return {key:'bermuda', extra:'For full-sun, high-traffic lawns where winter dormancy is acceptable, bermudagrass is the toughest warm-season choice.'};
+    return {key:'zoysia', extra:'Zoysiagrass gives a dense, drought-tough, lower-water lawn in full sun, with the best cold tolerance of the warm-season grasses.'};
+  }
+
+  // Cool-season path (the statewide default)
+  if (a.sun === 'shade') {
+    return {key:'fine', extra:'Fine fescues are by far the most shade-tolerant cool-season grass — they hold acceptable turf with as little as 3-4 hours of sun.'};
+  }
+  if (a.sun === 'mixed') {
+    return {key:'ttf_kbg', extra:'For a lawn that\'s part sun and part shade, a tall fescue / bluegrass sun-and-shade mix lets the right grass take over in each area. For deep shade, lean toward a fine-fescue-heavy mix.'};
+  }
+  if (a.sun === 'full' && a.use === 'active' && a.look === 'showcase' && a.maint === 'high') {
+    return {key:'ttf_kbg', extra:'For a high-traffic showcase lawn in full sun with regular care, adding Kentucky bluegrass to tall fescue gives density and the ability to repair worn spots.'};
+  }
+  if (a.sun === 'full' && a.maint === 'high' && a.look === 'showcase') {
+    return {key:'ttf_kbg', extra:'A tall fescue / bluegrass mix rewards full sun and regular maintenance with a dense, uniform lawn.'};
+  }
+  // default
+  return {key:'ttf', extra:'Turf-type tall fescue is the dominant home lawn grass in central Virginia — the best all-around fit for sun to moderate shade, with good drought tolerance and reasonable maintenance.'};
+}
+
+// ---- Rendering ----
+function renderProgress(){
+  var p = document.getElementById('progress');
+  p.innerHTML = '';
+  var total = QUESTIONS.length;
+  for (var i=0;i<total;i++){
+    var d = document.createElement('div');
+    d.className = 'pdot' + (i<step?' done':'') + (i===step?' active':'');
+    p.appendChild(d);
+  }
+}
+
+function renderQuestion(){
+  renderProgress();
+  document.getElementById('result').classList.add('hidden');
+  var quiz = document.getElementById('quiz');
+  var Q = QUESTIONS[step];
+  var html = '<div class="qcard"><div class="qnum">QUESTION ' + (step+1) + ' OF ' + QUESTIONS.length + '</div>'
+    + '<p class="qtext">' + Q.q + '</p><p class="qhint">' + Q.hint + '</p>';
+
+  if (Q.type === 'region'){
+    html += '<div class="region-row"><select class="region" id="region-select">';
+    REGIONS.forEach(function(r){
+      var sel = (r === 'Southern Piedmont') ? ' selected' : '';
+      var label = (r === 'Southern Piedmont') ? r + ' — incl. Chesterfield, Greater Richmond area' : r;
+      html += '<option value="' + r + '"' + sel + '>' + label + '</option>';
+    });
+    html += '</select></div>';
+    html += '<div class="opts" style="margin-top:16px;"><button class="opt" onclick="answerRegion()"><span class="emoji">📍</span><span class="otext">Use this region</span></button></div>';
+  } else {
+    html += '<div class="opts">';
+    Q.opts.forEach(function(o){
+      html += '<button class="opt" onclick="answer(\'' + Q.id + '\',\'' + o.v + '\')">'
+        + '<span class="emoji">' + o.e + '</span>'
+        + '<span class="otext">' + o.t + (o.s ? '<span class="osub">' + o.s + '</span>' : '') + '</span></button>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  quiz.innerHTML = html;
+
+  var bw = document.getElementById('backwrap');
+  bw.innerHTML = (step > 0) ? '<button class="backbtn" onclick="goBack()">← Back</button>' : '';
+}
+
+function answer(id, val){
+  answers[id] = val;
+  // The lawn-alternative path doesn't need the grass-selection questions — go straight to its guidance.
+  if (id === 'project' && val === 'alternative'){
+    renderAlternative();
+    return;
+  }
+  advance();
+}
+function answerRegion(){
+  answers.region = document.getElementById('region-select').value;
+  advance();
+}
+function advance(){
+  // Skip winter-color question where warm-season isn't adapted (Mountains)
+  step++;
+  if (step < QUESTIONS.length && QUESTIONS[step].id === 'winter'){
+    if (answers.region === 'Northern Mountains' || answers.region === 'Southern Mountains'){
+      answers.winter = 'green'; // cool-season only in the mountains
+      step++;
+    }
+  }
+  if (step >= QUESTIONS.length){ renderResult(); }
+  else { renderQuestion(); }
+}
+function goBack(){
+  if (step > 0){ step--; 
+    if (QUESTIONS[step].id === 'winter' && (answers.region==='Northern Mountains'||answers.region==='Southern Mountains')) step--;
+    renderQuestion();
+  }
+}
+
+function fmtRate(arr){ return arr[0]===arr[1] ? arr[0] : (arr[0] + '-' + arr[1]); }
+
+function renderResult(){
+  renderProgress();
+  document.getElementById('progress').querySelectorAll('.pdot').forEach(function(d){d.className='pdot done';});
+  document.getElementById('quiz').innerHTML = '';
+  document.getElementById('backwrap').innerHTML = '<button class="backbtn" onclick="goBack()">← Change my last answer</button>';
+
+  var rec = recommend(answers);
+  var sp = SPECIES[rec.key];
+  var R = document.getElementById('result');
+  R.classList.remove('hidden');
+
+  var isSeed = (sp.rateNew !== null);
+  var rateLine = isSeed
+    ? ('Seed at <strong>' + fmtRate(answers.project==='overseed'||answers.project==='patch' ? sp.rateOver : sp.rateNew) + ' lbs per 1,000 sq. ft.</strong> ' + (answers.project==='new'?'(new lawn)':'(overseeding)'))
+    : '<strong>Not sold as seed</strong> — establish from sod or plugs.';
+
+  var html = '<div class="qcard" id="result-card">'
+    + '<div class="print-only print-header">Virginia Lawn Seed Selector &mdash; Shopping List</div>'
+    + '<div class="result-head">🌱 Your VCE-adapted recommendation</div>'
+    + '<p class="pick">' + sp.name + '</p>'
+    + '<p class="pick-why">' + rec.extra + '</p>';
+
+  // Diagnosis reminder for overseed
+  if (answers.project === 'overseed' || answers.project === 'patch'){
+    var diagHead = (answers.project === 'patch') ? '🔍 First, figure out why that spot went bare' : '🔍 First, figure out why the old lawn thinned';
+    var diagIntro = (answers.project === 'patch')
+      ? 'Reseeding won\'t fix a site problem — and a spot that went bare once will often go bare again. VCE ("Fall Lawn Care," 430-520) recommends finding the cause first. What best describes the bare spot?'
+      : 'Reseeding won\'t fix a site problem — VCE ("Fall Lawn Care," 430-520) recommends finding the cause first so you don\'t repeat it. What best describes the failed area?';
+    html += '<div class="note gold"><span class="nt">' + diagHead + '</span>'
+      + diagIntro
+      + '<div class="diag-opts" id="diag-opts">'
+      + diagBtn('shade','🌳','Thin under trees or on the north side')
+      + diagBtn('traffic','🐾','Worn paths, pet runs, or play areas')
+      + diagBtn('drainage','💧','Stays wet, puddles, or grows moss')
+      + diagBtn('thatch','🧽','Spongy underfoot; thick mat at the soil')
+      + diagBtn('soil','🧪','Never soil-tested; pale or weak growth')
+      + diagBtn('drought','🌵','Dried out in summer; no irrigation')
+      + diagBtn('pest','🐛','Spreading dead patches, spots, or chewing')
+      + diagBtn('weeds','🌿','Weeds crowded the grass out')
+      + '</div>'
+      + '<div id="diag-result"></div>'
+      + '<details style="margin-top:10px;"><summary>See all causes and VCE fixes</summary>'
+      + '<div class="tbl-scroll"><table class="diag-table"><thead><tr><th>If you see…</th><th>Likely cause</th><th>VCE fix before reseeding</th></tr></thead><tbody>'
+      + diagRow('shade') + diagRow('traffic') + diagRow('drainage') + diagRow('thatch')
+      + diagRow('soil') + diagRow('drought') + diagRow('pest') + diagRow('weeds')
+      + '</tbody></table></div></details>'
+      + '</div>';
+  }
+
+  // Properties
+  html += '<div class="resblock"><h3>🌾 Why it fits your site</h3><div class="props">'
+    + prop('Shade', sp.shade) + prop('Traffic', sp.traffic) + prop('Drought', sp.drought)
+    + prop('Establishes', sp.establish) + prop('Winter', sp.winter) + prop('Texture', sp.texture)
+    + prop('Maintenance', sp.maint)
+    + '</div><p class="src" style="margin-top:8px;">Watch out for: ' + sp.watch + '</p></div>';
+
+  // Mixture/monoculture note
+  html += '<div class="note ' + (sp.season==='cool'?'green':'sky') + '">'
+    + '<span class="nt">' + (sp.season==='cool'?'🧬 Buy a blend or mixture':'🌡️ A warm-season note') + '</span>'
+    + sp.mixNote + '</div>';
+
+  // What the bag should say
+  html += '<div class="resblock"><h3>🛒 What to look for on the bag</h3>'
+    + '<p>Look for a bag labeled ' + sp.bag + '. Then check the seed tag:</p>'
+    + '<ul class="checklist">'
+    + '<li>Find the <strong>seed analysis tag</strong> — the front of the bag is marketing; the tag is the lab report. On small bags (15 lbs or less) it\'s printed on the back; on larger bags it\'s often <strong>sewn into the top seam</strong>; on jugs it\'s on the side panel.</li>'
+    + '<li>Look for a <strong>blue certification tag</strong> — it certifies the named varieties are authentic (a quality signal, though it doesn\'t by itself guarantee germination or purity).</li>'
+    + '<li>Names its <strong>cultivars/varieties</strong> — not just the species.</li>'
+    + '<li><strong>Germination 85% or higher</strong>, with a <strong>test date within the last 12 months</strong> (germination drops about 5% a year).</li>'
+    + '<li><strong>Low inert matter</strong> and near-zero weed seed / other crop seed.</li>'
+    + '<li><strong>Pure Live Seed</strong> = pure-seed % × germination %. A 90%-pure bag at 85% germination is only 76.5% live seed — use it to compare the real value of two bags.</li>'
+    + '<li class="avoid">Avoid <strong>"Kentucky 31" (K-31)</strong> — it\'s a coarse pasture grass, not a quality lawn grass.</li>'
+    + '<li class="avoid">Avoid mixes heavy on <strong>annual ryegrass</strong> — it dies within a year.</li>'
+    + '</ul>'
+    + '<details class="tag-demo no-print"><summary>👀 Show me what a seed tag looks like</summary>'
+    + '<p class="src" style="margin:8px 0;">A sample tag (not a real product) — every brand uses this same format. Here\'s what each line tells you:</p>'
+    + sampleTagSVG()
+    + '<p class="src" style="margin-top:8px;">Green = good signs · Red = watch-outs. Your bag\'s numbers will differ, but the layout is always the same.</p>'
+    + '</details>'
+    + '</div>';
+
+  // How much to buy
+  if (isSeed){
+    html += '<div class="resblock"><h3>📐 How much to buy</h3>'
+      + '<p>Enter your area to size the bag:</p>'
+      + '<p><input type="number" class="area-input" id="seed-area" placeholder="sq. ft." oninput="updateBuy(\'' + rec.key + '\')"> sq. ft. &nbsp;→&nbsp; <span class="buy-amount" id="buy-out">— lbs</span></p>'
+      + '<p class="src">⚖️ <strong>Coated seed:</strong> these pounds assume normal, uncoated seed. A clay, fertilizer, or mulch coating adds bag weight that isn\'t seed, so a "10 lb" coated bag holds less actual seed — fine for patching, but for a big new lawn buy a bit extra or compare the pure-live-seed weight, not the bag weight.</p>'
+      + '</div>';
+  }
+
+  // Timing
+  html += '<div class="resblock"><h3>📅 When to plant</h3><p>' + rateLine + '<br>Best window: <strong>' + sp.timing + '</strong>.</p></div>';
+
+  // Honest expectations
+  html += '<div class="note terra"><span class="nt">🌎 A realistic expectation</span>Virginia\'s transition-zone climate means no grass is trouble-free here — VCE puts it as "we can grow eight turfgrasses, not very well." '
+    + (sp.season==='warm' ? 'Your warm-season lawn will be tan and dormant for 4-5 months each winter.' : 'Choosing the right grass for your site is the best way to reduce future pest and water problems.') + '</div>';
+
+  // Next step
+  html += '<div class="note green"><span class="nt">➡️ Next step: feeding your new lawn</span>Once it\'s growing, use the <a href="[LINK_TO_CALCULATOR]">Lawn &amp; Garden Care Calculator</a> (' + (sp.season==='cool'?'Cool-Season':'Warm-Season') + ' Lawn tab) to plan fertilizer. For a brand-new lawn, a starter (higher-phosphorus) fertilizer helps rooting — see the calculator\'s "choose a fertilizer" table for starter grades.</div>';
+
+  // Backstop
+  html += '<details><summary>📋 Want VA-proven certified varieties?</summary><p class="src" style="margin-top:8px;">For the list of cultivars tested and recommended in Virginia — useful if you\'re buying certified seed or sourcing sod — see VCE publication SPES-617, "Virginia Turfgrass Variety Recommendations" (updated yearly). Most consumer bags won\'t name these exact cultivars, which is why the properties and label tips above matter more at the store.</p></details>';
+
+  html += '<div class="result-actions no-print">'
+    + '<button class="printbtn" onclick="window.print()">🖨️ Print my shopping list</button>'
+    + '<button class="restart" onclick="restart()">↺ Start over</button>'
+    + '</div>';
+  html += '</div>';
+
+  R.innerHTML = html;
+  R.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ---- Lawn-alternative / native groundcover path (VCE 426-609; EMG Handbook Ch. 11; VA Master Gardener guidance) ----
+function renderAlternative(){
+  renderProgress();
+  document.getElementById('progress').querySelectorAll('.pdot').forEach(function(d){d.className='pdot done';});
+  document.getElementById('quiz').innerHTML = '';
+  document.getElementById('backwrap').innerHTML = '<button class="backbtn" onclick="restart()">← Start over</button>';
+  var R = document.getElementById('result');
+  R.classList.remove('hidden');
+
+  var html = '<div class="qcard" id="result-card">'
+    + '<div class="print-only print-header">Virginia Lawn Alternatives &mdash; Groundcovers</div>'
+    + '<div class="result-head">🌼 Replacing lawn with a groundcover</div>'
+    + '<p class="pick" style="font-size:1.6rem;">A groundcover may be the better choice</p>'
+    + '<p class="pick-why">VCE agrees that in some sites a groundcover beats turf — its lawn guidance states that where grass struggles, "alternative ground covers are a better option than turf." Groundcovers cover bare soil, cut erosion, need far less mowing, and provide habitat for pollinators and other wildlife. (VCE 426-609; EMG Handbook chapter 11)</p>';
+
+  // When it makes sense
+  html += '<div class="resblock"><h3>✅ Good places to swap turf for a groundcover</h3>'
+    + '<ul class="checklist">'
+    + '<li><strong>Deep or dry shade</strong> where grass thins every year (under trees, north sides).</li>'
+    + '<li><strong>Steep slopes</strong> that are hard or unsafe to mow.</li>'
+    + '<li><strong>Wet or poorly drained</strong> low spots.</li>'
+    + '<li><strong>Heavy tree-root competition</strong> where turf loses out.</li>'
+    + '<li><strong>Low-use areas</strong> you don\'t walk or play on — groundcovers don\'t take foot traffic like turf.</li>'
+    + '</ul>'
+    + '<p class="src">A groundcover is a low, spreading plant (VCE: roughly 3 feet tall or shorter) that forms a dense living cover. Keep turf where you actually use the space; convert the spots where it\'s a losing battle.</p></div>';
+
+  // How to convert (MG process)
+  html += '<div class="resblock"><h3>🪴 How to convert an area (VCE / Master Gardener steps)</h3>'
+    + '<ol class="alt-steps">'
+    + '<li><strong>Start small.</strong> Pick one low-use area where grass already struggles — you don\'t have to convert the whole yard at once.</li>'
+    + '<li><strong>Assess the site.</strong> Note sun, shade, and how wet or dry it stays — these decide which natives will thrive.</li>'
+    + '<li><strong>Soil test.</strong> Get a VCE soil test for the area so you know pH and fertility before planting.</li>'
+    + '<li><strong>Clear the existing turf.</strong> Fully removing grass can take two to four months. Options include smothering, solarizing, or a herbicide. If you use a herbicide, the VCE Pest Management Guide: Home Grounds &amp; Animals (456-018) is the source for which product is appropriate, and the product\'s own label is the binding authority for application timing, rate, and all other use directions. Be patient so the turf doesn\'t regrow through your new planting.</li>'
+    + '<li><strong>Choose plants for the conditions.</strong> Match natives to the site\'s light and moisture (examples below).</li>'
+    + '<li><strong>Seeds or plugs?</strong> Seeds are usually cheaper; plugs establish faster and fill in sooner.</li>'
+    + '<li><strong>Plant in fall or spring</strong>, and follow spacing/spread guidance so plugs knit together.</li>'
+    + '</ol></div>';
+
+  // Native examples
+  html += '<div class="resblock"><h3>🌿 Matching natives to the site</h3>'
+    + '<p>The right plant depends on the spot\'s light and moisture. One VCE-cited example: in <strong>dry shade where turf won\'t grow</strong>, Pennsylvania sedge (<em>Carex pensylvanica</em>) is a native option. '
+    + 'For a fuller set of choices matched to sun, shade, and moisture, use the curated native-plant lists in the resources below rather than a single example here.</p>'
+    + '<p class="src">Match any choice to your specific conditions, and confirm it\'s native and non-invasive before planting.</p></div>';
+
+  // Where to go next
+  // NOTE (NonEdu rule): Virginia Native Plant Society (VNPS) IS included under Situation 1
+  // ("a specific VCE publication has directed clients to them"). Basis: the VCE Extension Master
+  // Gardener Handbook, Chapter 19 (Virginia Native Plants), lists "Virginia Native Plant Society:
+  // https://vnps.org/" in its Additional Resources, places it inside its trusted set alongside
+  // .edu/.gov sources ("Warning Internet Searchers"), and documents a Chesterfield-Extension-MG
+  // -to-VNPS-board personnel link (Ashley Moulton). NOT the earlier "agency partnership" argument,
+  // which does not by itself satisfy a gate. Scoped to native-plant lists/resources — range/nativity
+  // authority still belongs to the Digital Atlas of the Virginia Flora / USDA, per Ch. 19's own usage.
+  html += '<div class="note green"><span class="nt">📚 VCE and approved native-plant resources</span>'
+    + 'For selection and planting detail, start with VCE 426-609 "Selecting Landscape Plants: Groundcovers," and your local Extension office / Virginia Master Gardener Help Desk for region-specific help. '
+    + 'For curated native plant lists for our area and where to buy them locally, use <strong>Plant Virginia Natives / Plant RVA Natives</strong> (a Chesterfield Extension campaign partner — for its native-plant lists and retail locator). '
+    + 'The <strong>Virginia Native Plant Society</strong> (vnps.org) is a VCE-recognized native-plant resource (listed in the VCE Extension Master Gardener Handbook) for native plant lists and education. '
+    + 'To confirm a plant\'s native range, the <strong>USDA NRCS Plants Database</strong> (plants.usda.gov) is the authoritative source. '
+    + 'For additional Virginia-applicable native plant information, the <strong>Lady Bird Johnson Wildflower Center</strong> (wildflower.org, a University of Texas at Austin research center) maintains native plant lists.'
+    + '</div>';
+
+  html += '<div class="result-actions no-print">'
+    + '<button class="printbtn" onclick="window.print()">🖨️ Print this guidance</button>'
+    + '<button class="restart" onclick="restart()">↺ Start over</button>'
+    + '</div></div>';
+
+  R.innerHTML = html;
+  R.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function prop(label, val){
+  return '<div class="prop"><div class="pl">' + label + '</div><div class="pv">' + val + '</div></div>';
+}
+
+// Brand-free annotated sample seed tag (HTML, responsive)
+function sampleTagSVG(){
+  return '<div class="seed-tag">'
+    + '<div class="st-brandline">LAWN SEED MIXTURE &mdash; "Sun &amp; Shade" <span class="st-anno good">↤ front-of-bag name (marketing)</span></div>'
+    + '<div class="st-section">'
+      + '<div class="st-h">PURE SEED &nbsp;&nbsp; GERM. &nbsp;&nbsp; VARIETY</div>'
+      + '<div class="st-row"><span>39.20%</span><span>90%</span><span>Turf-Type Tall Fescue <em>(named cultivar)</em></span><span class="st-anno good">↤ names the cultivar ✓</span></div>'
+      + '<div class="st-row"><span>29.40%</span><span>90%</span><span>Turf-Type Tall Fescue <em>(named cultivar)</em></span></div>'
+      + '<div class="st-row"><span>19.60%</span><span>85%</span><span>Kentucky Bluegrass <em>(named cultivar)</em></span><span class="st-anno good">↤ a blend of 3+ ✓</span></div>'
+    + '</div>'
+    + '<div class="st-section">'
+      + '<div class="st-row2"><span>OTHER CROP</span><span>0.01%</span><span class="st-anno good">↤ near zero ✓</span></div>'
+      + '<div class="st-row2"><span>INERT MATTER</span><span>9.79%</span><span class="st-anno">↤ filler/coating — lower is better</span></div>'
+      + '<div class="st-row2"><span>WEED SEED</span><span>0.00%</span><span class="st-anno good">↤ zero ✓</span></div>'
+      + '<div class="st-row2"><span>NOXIOUS WEEDS</span><span>NONE FOUND</span><span class="st-anno good">↤ what you want ✓</span></div>'
+    + '</div>'
+    + '<div class="st-section">'
+      + '<div class="st-row2"><span>TEST DATE</span><span>02/2026</span><span class="st-anno good">↤ within 12 months ✓</span></div>'
+      + '<div class="st-row2"><span>NET WEIGHT</span><span>7 LBS</span><span class="st-anno">↤ bag weight (not all seed if coated)</span></div>'
+    + '</div>'
+    + '<div class="st-foot">Lot No. · Seller name &amp; address · Origin state'
+      + '<div class="st-anno bad" style="margin-top:6px;">Also scan for: "Kentucky 31 / K-31" or "annual ryegrass" in the variety list — avoid both ✕</div>'
+      + '<div class="st-anno good" style="margin-top:3px;">A <strong>blue tag</strong> on the bag = certified variety authenticity ✓</div>'
+    + '</div>'
+    + '</div>';
+}
+
+// ---- Diagnostic data (VCE 430-520, EMG Handbook Ch. 11, SPES-353) ----
+var DIAG = {
+  shade:   {symptom:'Thin under trees / north side', cause:'Too much shade',
+            fix:'Most grasses can\'t hold up in deep shade. Switch to fine fescues (the most shade-tolerant), thin the tree canopy if you can, or accept that some densely shaded spots won\'t support turf.'},
+  traffic: {symptom:'Worn paths, pet runs, play areas', cause:'Traffic and soil compaction',
+            fix:'Heavy traffic compacts soil and restricts roots. Core-aerate the area, choose a traffic-tolerant grass (tall fescue or a tall fescue/bluegrass mix), and reroute foot traffic where possible.'},
+  drainage:{symptom:'Stays wet, puddles, grows moss', cause:'Poor drainage',
+            fix:'Grass roots can\'t survive in saturated soil (and moss moves in). Improve surface or subsurface drainage and correct low spots before reseeding — renovation is a good time to fix grade.'},
+  thatch:  {symptom:'Spongy feel; thick mat at the soil', cause:'Excess thatch',
+            fix:'A thatch layer over half an inch blocks seed-to-soil contact, so seed sown on top is wasted. Dethatch or vertical-mow (rental machines work) before seeding.'},
+  soil:    {symptom:'Never soil-tested; pale, weak growth', cause:'Fertility or pH problem',
+            fix:'Virginia soils are often very acidic. Don\'t guess — soil test. A test of pH and fertility is often the whole answer to "why did my turf fail," and lime or fertilizer can be applied per the result.'},
+  drought: {symptom:'Dried out in summer; no irrigation', cause:'Drought / wrong grass for the water',
+            fix:'Without irrigation, pick a drought-tolerant grass (tall fescue\'s deep roots, or a warm-season grass) and don\'t fertilize dry turf. Don\'t reseed into a drought either — wait for reliable moisture.'},
+  pest:    {symptom:'Spreading dead patches, spots, chewing', cause:'Insect or disease damage',
+            fix:'Identify the insect or disease before you reseed — reseeding alone won\'t fix an active problem, and the new grass will fail the same way. Your local Extension office can help diagnose it, and the VCE Pest Management Guide: Home Grounds &amp; Animals (456-018) lists control options once you know what it is. If a treatment is needed, always follow the product label.'},
+  weeds:   {symptom:'Weeds crowded the grass out', cause:'Weed invasion',
+            fix:'Control perennial weeds first — especially tough grassy weeds (bermudagrass in cool-season turf, nimblewill, quackgrass), which a single pass rarely kills. VCE advises starting a non-selective herbicide (glyphosate) 30-45 days before renovation, so there\'s time to re-treat any regrowth before you prep the soil and seed. The VCE Pest Management Guide: Home Grounds &amp; Animals (456-018) is the source for which product to use; the product label is the binding authority for the rate, timing, and all other directions.'}
+};
+
+function diagBtn(key, emoji, text){
+  return '<button class="diag-opt" onclick="showDiag(\'' + key + '\', this)"><span class="emoji">' + emoji + '</span><span>' + text + '</span></button>';
+}
+function diagRow(key){
+  var d = DIAG[key];
+  return '<tr><td>' + d.symptom + '</td><td><strong>' + d.cause + '</strong></td><td>' + d.fix + '</td></tr>';
+}
+function showDiag(key, btn){
+  var d = DIAG[key];
+  var opts = document.querySelectorAll('#diag-opts .diag-opt');
+  opts.forEach(function(o){ o.classList.remove('selected'); });
+  if (btn) btn.classList.add('selected');
+  document.getElementById('diag-result').innerHTML =
+    '<div class="diag-answer"><strong>Likely cause: ' + d.cause + '</strong><br>' + d.fix
+    + '<br><span class="src">Fix this before you reseed, or the new grass may fail the same way. (VCE 430-520; EMG Handbook chapter 11)</span></div>';
+}
+
+function updateBuy(key){
+  var sp = SPECIES[key];
+  var area = parseFloat(document.getElementById('seed-area').value) || 0;
+  var rate = (answers.project==='overseed'||answers.project==='patch') ? sp.rateOver : sp.rateNew;
+  var out = document.getElementById('buy-out');
+  if (area > 0){
+    var lo = Math.round(rate[0] * area / 1000 * 10)/10;
+    var hi = Math.round(rate[1] * area / 1000 * 10)/10;
+    out.textContent = (lo===hi ? lo : (lo + '-' + hi)) + ' lbs of seed';
+  } else { out.textContent = '— lbs'; }
+}
+
+function restart(){ answers = {}; step = 0; renderQuestion(); }
+
+// init
+renderQuestion();
+</script>
+</body>
+</html>
