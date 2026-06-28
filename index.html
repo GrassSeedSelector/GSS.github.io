@@ -151,6 +151,16 @@
   .area-input{font-family:'Newsreader',serif; font-size:1rem; padding:8px 12px; width:130px;
     border:1.5px solid var(--border); border-radius:8px; background:var(--card);}
 
+  /* Warm-season seed toggles (hulled / coated) */
+  .seed-toggles{margin:12px 0 4px; padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:9px;}
+  .seed-toggle-row{margin-bottom:8px;}
+  .seed-toggle-row:last-child{margin-bottom:0;}
+  .seed-toggle-row .stl{font-family:'IBM Plex Mono',monospace; font-size:0.7rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--slate); display:block; margin-bottom:5px;}
+  .seed-toggle-row label{display:inline-flex; align-items:center; gap:5px; margin-right:14px;
+    font-size:0.93rem; color:var(--ink); cursor:pointer;}
+  .seed-toggle-row input[type=radio]{cursor:pointer; accent-color:var(--green-deep);}
+
   .restart{display:inline-block; margin-top:10px; background:var(--green-deep); color:#f3f1e9;
     border:none; border-radius:9px; padding:12px 22px; font-family:'IBM Plex Mono',monospace;
     font-size:0.82rem; letter-spacing:0.05em; cursor:pointer;}
@@ -195,6 +205,20 @@
   }
 
   .src{font-size:0.82rem; color:var(--slate); font-style:italic; line-height:1.5;}
+
+  /* Citation footnotes */
+  .cite{font-family:'IBM Plex Mono',monospace; font-size:0.68rem; font-weight:500;
+    color:var(--green); text-decoration:none; padding:0 1px; vertical-align:super; line-height:0;}
+  .cite:hover{color:var(--green-deep); text-decoration:underline;}
+  .sources-list{list-style:none; padding:0; margin:8px 0; counter-reset:src;}
+  .sources-list li{padding:6px 0 6px 32px; position:relative; font-size:0.88rem;
+    color:var(--slate); border-bottom:1px solid var(--border); line-height:1.5;}
+  .sources-list li::before{counter-increment:src; content:"[" counter(src) "]";
+    position:absolute; left:0; top:6px; font-family:'IBM Plex Mono',monospace;
+    font-size:0.78rem; color:var(--green); font-weight:500;}
+  .sources-list li:last-child{border-bottom:none;}
+  .sources-list .src-org{font-weight:500; color:var(--ink);}
+  .sources-list a{color:var(--sky); word-break:break-all;}
   footer{padding-top:30px; margin-top:20px; border-top:1px solid var(--rule);
     font-size:0.82rem; color:var(--slate-light);}
   .hidden{display:none;}
@@ -229,6 +253,60 @@
 // ============================================================
 //  GRASS SEED SELECTION — standalone tool
 // ============================================================
+
+// ---- Sources (numbered footnote system) ----
+// Master citation list. Inline content calls cite(key) to insert a numbered superscript and record use;
+// renderSourcesBlock() then prints only the cited sources, in citation order, at the end of the result card.
+// VCE sources come first (preferred tier per Chesterfield County Extension Help Desk Source Guidelines, April 2026).
+// Other land-grant Extensions are used only where VCE does not cover the topic, with attention to climate parity.
+var SOURCES = {
+  'spes-748':   {org:'Virginia Cooperative Extension', cite:'Goatley, M., et al. "Selecting Turfgrass for Virginia." VCE publication SPES-748.', url:'https://www.pubs.ext.vt.edu/SPES/spes-748/spes-748.html'},
+  'spes-299p':  {org:'Virginia Cooperative Extension', cite:'Goatley, M., Hardiman, T., Chalmers, D., Whitt, D. "Agronomy Handbook Part III: Turfgrass." VCE publication SPES-299P (424-100-C).', url:'https://www.pubs.ext.vt.edu/424/424-100/424-100-C.html'},
+  'spes-617':   {org:'Virginia Cooperative Extension', cite:'"Virginia Turfgrass Variety Recommendations." VCE publication SPES-617 / SPES-727 (updated yearly).', url:'https://www.pubs.ext.vt.edu/SPES/spes-727/spes-727.html'},
+  '430-520':    {org:'Virginia Cooperative Extension', cite:'"Fall Lawn Care." VCE publication 430-520 / SPES-223P.', url:'https://www.pubs.ext.vt.edu/430/430-520/430-520.html'},
+  '430-522':    {org:'Virginia Cooperative Extension', cite:'"Maintenance Calendar for Warm-Season Turfgrasses." VCE publication 430-522 / SPES-669P.', url:'https://www.pubs.ext.vt.edu/430/430-522/430-522.html'},
+  '430-523':    {org:'Virginia Cooperative Extension', cite:'"Maintenance Calendar for Cool-Season Turfgrasses." VCE publication 430-523 / SPES-670P.', url:'https://www.pubs.ext.vt.edu/430/430-523/430-523.html'},
+  'emg-11':     {org:'Virginia Cooperative Extension', cite:'Extension Master Gardener Handbook, Chapter 11: Lawn Establishment and Renovation.', url:'https://pressbooks.lib.vt.edu/emgtraining/chapter/11/'},
+  '418-040':    {org:'Virginia Cooperative Extension', cite:'Goatley, M. "Sod Source Selection, Installation, Maintenance, and Producers in Virginia." VCE publication 418-040.', url:'https://www.pubs.ext.vt.edu/418/418-040/418-040.html'},
+  '426-609':    {org:'Virginia Cooperative Extension', cite:'"Selecting Landscape Plants: Groundcovers." VCE publication 426-609.', url:'https://www.pubs.ext.vt.edu/426/426-609/426-609.html'},
+  '456-018':    {org:'Virginia Cooperative Extension', cite:'"Pest Management Guide: Home Grounds and Animals." VCE publication 456-018 / ENTO-634P (updated yearly).', url:'https://www.pubs.ext.vt.edu/ENTO/ento-634/ento-634.html'},
+  'ncsu-ag493': {org:'NC State Extension', cite:'"Bermudagrass Production in North Carolina." NC State Extension publication AG-493.', url:'https://content.ces.ncsu.edu/bermudagrass-production-in-north-carolina'},
+  'umd-pls':    {org:'University of Maryland Extension', cite:'"Wildlife Plantings: Shrub Lespedezas." University of Maryland Extension publication FS759. (Pure Live Seed conversion formula.)', url:'https://extension.umd.edu/sites/extension.umd.edu/files/2021-03/FS759_WMgtShrubLes.pdf'},
+  'tamu-bermuda':{org:'Texas A&M AgriLife Extension', cite:'"Bermudagrass." Texas A&M AgriLife Extension, Aggie Horticulture. (Used for hulled/unhulled planting biology; cited under the "Other universities" tier of the Chesterfield Help Desk Source Guidelines because no preferred-tier .edu source articulates the hulled-vs-unhulled timing distinction explicitly. Biology is climate-independent; Virginia planting windows come from VCE Agronomy Handbook Part III, Table 2.)', url:'https://aggie-hort.tamu.edu/plantanswers/turf/publications/Bermuda.html'}
+};
+var citedOrder = [];
+function cite(key){
+  if (!SOURCES[key]) return '';
+  if (citedOrder.indexOf(key) === -1) citedOrder.push(key);
+  var n = citedOrder.indexOf(key) + 1;
+  return '<sup><a class="cite" href="#src-' + n + '">[' + n + ']</a></sup>';
+}
+function citeMulti(keys){
+  // Multiple sources for one claim, rendered as [1,3] with each number a separate link
+  var parts = [];
+  for (var i = 0; i < keys.length; i++){
+    var k = keys[i];
+    if (!SOURCES[k]) continue;
+    if (citedOrder.indexOf(k) === -1) citedOrder.push(k);
+    parts.push(citedOrder.indexOf(k) + 1);
+  }
+  if (parts.length === 0) return '';
+  var links = parts.map(function(n){ return '<a class="cite" href="#src-' + n + '">' + n + '</a>'; });
+  return '<sup>[' + links.join(',') + ']</sup>';
+}
+function renderSourcesBlock(){
+  if (citedOrder.length === 0) return '';
+  var html = '<div class="resblock"><h3>📚 Sources</h3>'
+    + '<p class="src" style="margin:0 0 8px;">Sources are listed in the order they appear in this recommendation. Virginia Cooperative Extension sources take precedence; other land-grant Extension sources are used only where VCE does not cover the topic.</p>'
+    + '<ol class="sources-list">';
+  for (var i = 0; i < citedOrder.length; i++){
+    var s = SOURCES[citedOrder[i]];
+    html += '<li id="src-' + (i+1) + '"><span class="src-org">' + s.org + ':</span> ' + s.cite;
+    if (s.url) html += ' <a href="' + s.url + '" target="_blank" rel="noopener">' + s.url + '</a>';
+    html += '</li>';
+  }
+  return html + '</ol></div>';
+}
 
 // ---- Species property profiles (SPES-748) ----
 var SPECIES = {
@@ -278,16 +356,16 @@ var SPECIES = {
           shade:'Poor (full sun only)', traffic:'Excellent', drought:'Excellent', establish:'Fast, aggressive',
           winter:'Dormant tan 4-5 months', texture:'Fine-medium', maint:'Medium',
           watch:'Can spread into beds as "wiregrass"; full sun only',
-          rateNew:null, rateOver:null, timing:'Late spring to early summer',
-          bag:'"Bermudagrass" seed (seeded types)',
-          mixNote:'Tough and drought-hardy in full sun, but aggressive — it will creep into flower beds.'},
+          rateNew:[1,2], rateOver:[1,2], hasHulling:true, timing:'Late spring to early summer',
+          bag:'"Common Bermudagrass" seed (only common-type bermuda is sold as seed; the cold-tolerant hybrids on the Virginia recommended list — Tahoma 31, TifTuf, Latitude 36, Tifway — are sod or sprigs only)',
+          mixNote:'Tough and drought-hardy in full sun, but aggressive — it will creep into flower beds. Virginia\'s most cold-tolerant recommended cultivars (Tahoma 31, TifTuf, Latitude 36) are hybrids established only from sod or sprigs; common-type bermudagrass is what comes in a seed bag.'},
   centipede:{name:'Centipedegrass', season:'warm',
           shade:'Moderate', traffic:'Low', drought:'Good', establish:'Slow',
           winter:'Dormant tan', texture:'Medium', maint:'Lowest warm-season',
           watch:'Very fertilizer-sensitive; only the southernmost counties',
-          rateNew:null, rateOver:null, timing:'Late spring to early summer',
+          rateNew:[0.25,0.5], rateOver:[0.25,0.5], hasHulling:false, timing:'Late spring to early summer',
           bag:'"Centipedegrass" seed',
-          mixNote:'A genuine low-input grass for far southern Virginia — easy to over-fertilize, so go light.'},
+          mixNote:'A genuine low-input grass for far southern Virginia — easy to over-fertilize, so go light. Seed is widely available, though plugs and sod give faster cover.'},
   staug: {name:'St. Augustinegrass', season:'warm',
           shade:'Good (for a warm-season grass)', traffic:'Low-moderate', drought:'Moderate', establish:'No seed — sod or plugs',
           winter:'Dormant tan', texture:'Coarse', maint:'Medium-high',
@@ -463,6 +541,7 @@ function goBack(){
 function fmtRate(arr){ return arr[0]===arr[1] ? arr[0] : (arr[0] + '-' + arr[1]); }
 
 function renderResult(){
+  citedOrder = [];
   renderProgress();
   document.getElementById('progress').querySelectorAll('.pdot').forEach(function(d){d.className='pdot done';});
   document.getElementById('quiz').innerHTML = '';
@@ -482,14 +561,14 @@ function renderResult(){
     + '<div class="print-only print-header">Virginia Lawn Seed Selector &mdash; Shopping List</div>'
     + '<div class="result-head">🌱 Your VCE-adapted recommendation</div>'
     + '<p class="pick">' + sp.name + '</p>'
-    + '<p class="pick-why">' + rec.extra + '</p>';
+    + '<p class="pick-why">' + rec.extra + cite('spes-748') + '</p>';
 
   // Diagnosis reminder for overseed
   if (answers.project === 'overseed' || answers.project === 'patch'){
     var diagHead = (answers.project === 'patch') ? '🔍 First, figure out why that spot went bare' : '🔍 First, figure out why the old lawn thinned';
     var diagIntro = (answers.project === 'patch')
-      ? 'Reseeding won\'t fix a site problem — and a spot that went bare once will often go bare again. VCE ("Fall Lawn Care," 430-520) recommends finding the cause first. What best describes the bare spot?'
-      : 'Reseeding won\'t fix a site problem — VCE ("Fall Lawn Care," 430-520) recommends finding the cause first so you don\'t repeat it. What best describes the failed area?';
+      ? 'Reseeding won\'t fix a site problem — and a spot that went bare once will often go bare again. VCE recommends finding the cause first' + citeMulti(['430-520','emg-11']) + '. What best describes the bare spot?'
+      : 'Reseeding won\'t fix a site problem — VCE recommends finding the cause first so you don\'t repeat it' + citeMulti(['430-520','emg-11']) + '. What best describes the failed area?';
     html += '<div class="note gold"><span class="nt">' + diagHead + '</span>'
       + diagIntro
       + '<div class="diag-opts" id="diag-opts">'
@@ -512,7 +591,7 @@ function renderResult(){
   }
 
   // Properties
-  html += '<div class="resblock"><h3>🌾 Why it fits your site</h3><div class="props">'
+  html += '<div class="resblock"><h3>🌾 Why it fits your site' + cite('spes-748') + '</h3><div class="props">'
     + prop('Shade', sp.shade) + prop('Traffic', sp.traffic) + prop('Drought', sp.drought)
     + prop('Establishes', sp.establish) + prop('Winter', sp.winter) + prop('Texture', sp.texture)
     + prop('Maintenance', sp.maint)
@@ -521,49 +600,99 @@ function renderResult(){
   // Mixture/monoculture note
   html += '<div class="note ' + (sp.season==='cool'?'green':'sky') + '">'
     + '<span class="nt">' + (sp.season==='cool'?'🧬 Buy a blend or mixture':'🌡️ A warm-season note') + '</span>'
-    + sp.mixNote + '</div>';
+    + sp.mixNote + cite('spes-748') + '</div>';
 
-  // What the bag should say
-  html += '<div class="resblock"><h3>🛒 What to look for on the bag</h3>'
-    + '<p>Look for a bag labeled ' + sp.bag + '. Then check the seed tag:</p>'
-    + '<ul class="checklist">'
-    + '<li>Find the <strong>seed analysis tag</strong> — the front of the bag is marketing; the tag is the lab report. On small bags (15 lbs or less) it\'s printed on the back; on larger bags it\'s often <strong>sewn into the top seam</strong>; on jugs it\'s on the side panel.</li>'
-    + '<li>Look for a <strong>blue certification tag</strong> — it certifies the named varieties are authentic (a quality signal, though it doesn\'t by itself guarantee germination or purity).</li>'
-    + '<li>Names its <strong>cultivars/varieties</strong> — not just the species.</li>'
-    + '<li><strong>Germination 85% or higher</strong>, with a <strong>test date within the last 12 months</strong> (germination drops about 5% a year).</li>'
-    + '<li><strong>Low inert matter</strong> and near-zero weed seed / other crop seed.</li>'
-    + '<li><strong>Pure Live Seed</strong> = pure-seed % × germination %. A 90%-pure bag at 85% germination is only 76.5% live seed — use it to compare the real value of two bags.</li>'
-    + '<li class="avoid">Avoid <strong>"Kentucky 31" (K-31)</strong> — it\'s a coarse pasture grass, not a quality lawn grass.</li>'
-    + '<li class="avoid">Avoid mixes heavy on <strong>annual ryegrass</strong> — it dies within a year.</li>'
-    + '</ul>'
-    + '<details class="tag-demo no-print"><summary>👀 Show me what a seed tag looks like</summary>'
-    + '<p class="src" style="margin:8px 0;">A sample tag (not a real product) — every brand uses this same format. Here\'s what each line tells you:</p>'
-    + sampleTagSVG()
-    + '<p class="src" style="margin-top:8px;">Green = good signs · Red = watch-outs. Your bag\'s numbers will differ, but the layout is always the same.</p>'
-    + '</details>'
-    + '</div>';
+  // What the bag should say (only for species sold as seed)
+  if (isSeed){
+    html += '<div class="resblock"><h3>🛒 What to look for on the bag</h3>'
+      + '<p>Look for a bag labeled ' + sp.bag + '. Then check the seed tag' + cite('spes-299p') + ':</p>'
+      + '<ul class="checklist">'
+      + '<li>Find the <strong>seed analysis tag</strong> — the front of the bag is marketing; the tag is the lab report. On small bags (15 lbs or less) it\'s printed on the back; on larger bags it\'s often <strong>sewn into the top seam</strong>; on jugs it\'s on the side panel.</li>'
+      + '<li>Look for a <strong>blue certification tag</strong> — it certifies the named varieties are authentic (a quality signal, though it doesn\'t by itself guarantee germination or purity)' + cite('spes-299p') + '.</li>'
+      + '<li>Names its <strong>cultivars/varieties</strong> — not just the species' + cite('spes-617') + '.</li>'
+      + '<li><strong>Germination 85% or higher</strong>, with a <strong>test date within the last 12 months</strong> (germination drops about 5% a year)' + cite('spes-299p') + '.</li>'
+      + '<li><strong>Low inert matter</strong> and near-zero weed seed / other crop seed' + cite('spes-299p') + '.</li>'
+      + '<li><strong>Pure Live Seed</strong> = pure-seed % × germination %. A 90%-pure bag at 85% germination is only 76.5% live seed — use it to compare the real value of two bags' + citeMulti(['spes-299p','umd-pls']) + '.</li>';
+    if (sp.season === 'cool'){
+      html += '<li class="avoid">Avoid <strong>"Kentucky 31" (K-31)</strong> — it\'s a coarse pasture grass, not a quality lawn grass' + cite('spes-299p') + '.</li>'
+        + '<li class="avoid">Avoid mixes heavy on <strong>annual ryegrass</strong> — it dies within a year' + cite('spes-299p') + '.</li>';
+    }
+    html += '</ul>';
+
+    // Warm-season seed addendum (hulled/unhulled for bermuda; coating prominence for both)
+    if (sp.season === 'warm'){
+      html += '<div class="note sky"><span class="nt">🌡️ Extra label items for ' + sp.name.toLowerCase() + ' seed</span>';
+      if (sp.hasHulling){
+        html += '<p style="margin:0 0 8px;"><strong>Hulled or unhulled?</strong> Improved seeded bermudagrass is sold in three forms: hulled, unhulled, and hulled-and-clay-coated' + cite('ncsu-ag493') + '. The hull is the seed\'s natural outer coat. Spring and summer plantings typically use hulled seed for faster germination; late-fall and winter plantings sometimes use unhulled seed so a portion of the seed stays dormant until warmer conditions arrive' + cite('tamu-bermuda') + '. The seed tag will say which form is in the bag. VCE seeding rates differ substantially between the two: 1-2 lbs per 1,000 sq ft for hulled, 5-10 lbs for unhulled' + cite('spes-299p') + '.</p>';
+      }
+      html += '<p style="margin:0 0 8px;"><strong>Coating shows up on the tag as inert matter.</strong> A clay coating is added to make small seeds easier to broadcast' + cite('ncsu-ag493') + '. Because the coating doesn\'t germinate, it counts as inert matter on the seed analysis tag. Read your bag\'s inert-matter percentage to see what fraction of the bag is coating versus actual seed: a heavily coated bag can be close to half coating by weight, which means a "10 lb" bag may hold considerably less than 10 lbs of seed.</p>'
+        + '<p style="margin:0;"><strong>Compare bags by pure live seed (PLS),</strong> not by bag weight. VCE seeding rates are stated in PLS' + cite('spes-299p') + ' for a reason: between hulled and unhulled, and coated and uncoated, two bags of the same labeled weight can deliver very different amounts of actual seed. The PLS figure (pure-seed % × germination %) is how to compare them fairly. The calculator below adjusts for this.</p>'
+        + '</div>';
+    }
+
+    html += '<details class="tag-demo no-print"><summary>👀 Show me what a seed tag looks like</summary>'
+      + '<p class="src" style="margin:8px 0;">A sample tag modeled on the VCE Agronomy Handbook Part III' + cite('spes-299p') + ' (not a real product) — every brand uses this same format. Here\'s what each line tells you:</p>'
+      + sampleTagSVG()
+      + '<p class="src" style="margin-top:8px;">Green = good signs · Red = watch-outs. Your bag\'s numbers will differ, but the layout is always the same. ' + (sp.season === 'warm' ? '(This example is a cool-season blend, but the tag format is identical for ' + sp.name.toLowerCase() + ' — just look for hulled/unhulled and a higher inert-matter figure for coated seed.)' : '') + '</p>'
+      + '</details>'
+      + '</div>';
+  } else {
+    // Not sold as seed (currently only St. Augustinegrass) — give sod/plug shopping guidance instead
+    html += '<div class="resblock"><h3>🛒 What to look for when buying ' + sp.name.toLowerCase() + '</h3>'
+      + '<p>' + sp.name + ' isn\'t sold as seed. You\'ll buy it as <strong>sod</strong> (rolls or slabs of mature turf with soil and roots intact) or as <strong>plugs</strong> (small squares that spread to fill in over a season or two)' + cite('spes-748') + '.</p>'
+      + '<ul class="checklist">'
+      + '<li>Buy from a <strong>certified Virginia sod producer</strong> when possible' + cite('418-040') + '.</li>'
+      + '<li>Sod should be <strong>freshly cut, evenly green, and weed-free</strong>, with moist (not soggy) soil and roots that hold the slab together when lifted' + cite('418-040') + '.</li>'
+      + '<li>Install sod the day it arrives, or keep it shaded and moist; pieces dry out and decline quickly on a pallet' + cite('418-040') + '.</li>'
+      + '<li>For plugs, the standard spacing is <strong>2-inch plugs on 12-inch centers</strong>, which typically gives full cover in one growing season' + cite('emg-11') + '.</li>'
+      + '<li>Ask the producer which cultivar you\'re getting — varietal differences in cold tolerance and pest resistance matter' + cite('spes-617') + '.</li>'
+      + '</ul>'
+      + '</div>';
+  }
 
   // How much to buy
   if (isSeed){
     html += '<div class="resblock"><h3>📐 How much to buy</h3>'
       + '<p>Enter your area to size the bag:</p>'
-      + '<p><input type="number" class="area-input" id="seed-area" placeholder="sq. ft." oninput="updateBuy(\'' + rec.key + '\')"> sq. ft. &nbsp;→&nbsp; <span class="buy-amount" id="buy-out">— lbs</span></p>'
-      + '<p class="src">⚖️ <strong>Coated seed:</strong> these pounds assume normal, uncoated seed. A clay, fertilizer, or mulch coating adds bag weight that isn\'t seed, so a "10 lb" coated bag holds less actual seed — fine for patching, but for a big new lawn buy a bit extra or compare the pure-live-seed weight, not the bag weight.</p>'
-      + '</div>';
+      + '<p><input type="number" class="area-input" id="seed-area" placeholder="sq. ft." oninput="updateBuy(\'' + rec.key + '\')"> sq. ft. &nbsp;→&nbsp; <span class="buy-amount" id="buy-out">— lbs</span></p>';
+
+    if (sp.season === 'warm'){
+      // Warm-season seed has heavy coating and (for bermuda) a hulled/unhulled choice that materially changes bag weight.
+      // Default each toggle to the more common retail scenario so the displayed figure matches what a homeowner most likely buys.
+      html += '<div class="seed-toggles">';
+      if (sp.hasHulling){
+        html += '<div class="seed-toggle-row"><span class="stl">Hulled or unhulled?</span>'
+          + '<label><input type="radio" name="hull" value="hulled" checked onchange="updateBuy(\'' + rec.key + '\')"> Hulled (faster germination — typical at retail)</label>'
+          + '<label><input type="radio" name="hull" value="unhulled" onchange="updateBuy(\'' + rec.key + '\')"> Unhulled (slower, more forgiving — VCE rate is about 5 times higher)</label>'
+          + '</div>';
+      }
+      html += '<div class="seed-toggle-row"><span class="stl">Coated or uncoated?</span>'
+        + '<label><input type="radio" name="coat" value="uncoated" checked onchange="updateBuy(\'' + rec.key + '\')"> Uncoated (raw seed)</label>'
+        + '<label><input type="radio" name="coat" value="coated" onchange="updateBuy(\'' + rec.key + '\')"> Coated (clay coating — most retail bags; roughly doubles needed bag weight)</label>'
+        + '</div>'
+        + '</div>'
+        + '<p class="src" style="margin-top:8px;">⚖️ Base rates come from VCE Agronomy Handbook Part III, Table 1' + cite('spes-299p') + ': ' + (sp.hasHulling ? '1-2 lbs per 1,000 sq ft for hulled bermudagrass, 5-10 lbs for unhulled' : '0.25-0.5 lbs per 1,000 sq ft for centipedegrass') + ', stated in <strong>pure live seed</strong>. The VCE table doesn\'t adjust for coating, but because the underlying rate is in PLS, a coated bag (where coating reduces purity, hence PLS) needs more bag weight to deliver the same PLS. The "Coated" setting here doubles the listed pounds as a typical estimate; for precision, compute the actual conversion from your bag\'s tag using the formula <code>lb. PLS recommended &divide; (% germination &times; % purity) = lb. of seed to plant</code>' + cite('umd-pls') + '.</p>';
+    } else {
+      html += '<p class="src">⚖️ Base rate from VCE Agronomy Handbook Part III, Table 1' + cite('spes-299p') + '. <strong>Coated seed:</strong> these pounds assume normal, uncoated seed. A clay, fertilizer, or mulch coating adds bag weight that isn\'t seed, so a "10 lb" coated bag holds less actual seed — for precision, use the PLS conversion: <code>lb. PLS recommended &divide; (% germination &times; % purity) = lb. of seed to plant</code>' + cite('umd-pls') + '.</p>';
+    }
+    html += '</div>';
   }
 
   // Timing
-  html += '<div class="resblock"><h3>📅 When to plant</h3><p>' + rateLine + '<br>Best window: <strong>' + sp.timing + '</strong>.</p></div>';
+  html += '<div class="resblock"><h3>📅 When to plant</h3><p>' + rateLine + '<br>Best window: <strong>' + sp.timing + '</strong>' + cite(sp.season === 'cool' ? '430-523' : '430-522') + '.</p></div>';
 
   // Honest expectations
-  html += '<div class="note terra"><span class="nt">🌎 A realistic expectation</span>Virginia\'s transition-zone climate means no grass is trouble-free here — VCE puts it as "we can grow eight turfgrasses, not very well." '
+  html += '<div class="note terra"><span class="nt">🌎 A realistic expectation</span>Virginia\'s transition-zone climate means no grass is trouble-free here — VCE puts it as "we can grow eight turfgrasses, not very well"' + cite('spes-748') + '. '
     + (sp.season==='warm' ? 'Your warm-season lawn will be tan and dormant for 4-5 months each winter.' : 'Choosing the right grass for your site is the best way to reduce future pest and water problems.') + '</div>';
 
   // Next step
   html += '<div class="note green"><span class="nt">➡️ Next step: feeding your new lawn</span>Once it\'s growing, use the <a href="[LINK_TO_CALCULATOR]">Lawn &amp; Garden Care Calculator</a> (' + (sp.season==='cool'?'Cool-Season':'Warm-Season') + ' Lawn tab) to plan fertilizer. For a brand-new lawn, a starter (higher-phosphorus) fertilizer helps rooting — see the calculator\'s "choose a fertilizer" table for starter grades.</div>';
 
   // Backstop
-  html += '<details><summary>📋 Want VA-proven certified varieties?</summary><p class="src" style="margin-top:8px;">For the list of cultivars tested and recommended in Virginia — useful if you\'re buying certified seed or sourcing sod — see VCE publication SPES-617, "Virginia Turfgrass Variety Recommendations" (updated yearly). Most consumer bags won\'t name these exact cultivars, which is why the properties and label tips above matter more at the store.</p></details>';
+  html += '<details><summary>📋 Want VA-proven certified varieties?</summary><p class="src" style="margin-top:8px;">For the list of cultivars tested and recommended in Virginia — useful if you\'re buying certified seed or sourcing sod — see the annually updated VCE turfgrass variety recommendations' + cite('spes-617') + '. Most consumer bags won\'t name these exact cultivars, which is why the properties and label tips above matter more at the store.</p></details>';
+
+  // Sources — generated from cite() calls accumulated above
+  html += renderSourcesBlock();
 
   html += '<div class="result-actions no-print">'
     + '<button class="printbtn" onclick="window.print()">🖨️ Print my shopping list</button>'
@@ -649,27 +778,30 @@ function prop(label, val){
   return '<div class="prop"><div class="pl">' + label + '</div><div class="pv">' + val + '</div></div>';
 }
 
-// Brand-free annotated sample seed tag (HTML, responsive)
+// Sample seed tag modeled on VCE Agronomy Handbook Part III (SPES-299P), p. 80.
+// Numbers, percentages, varieties, and origin codes follow the VCE example verbatim;
+// the green/red callout annotations are added as a pedagogical overlay (not in the VCE original).
 function sampleTagSVG(){
   return '<div class="seed-tag">'
-    + '<div class="st-brandline">LAWN SEED MIXTURE &mdash; "Sun &amp; Shade" <span class="st-anno good">↤ front-of-bag name (marketing)</span></div>'
+    + '<div class="st-brandline">GRASS SEED MIXTURE &nbsp;&nbsp; Lot #1234-56 <span class="st-anno good">↤ front-of-bag identifier (lot number, not a brand to trust)</span></div>'
     + '<div class="st-section">'
-      + '<div class="st-h">PURE SEED &nbsp;&nbsp; GERM. &nbsp;&nbsp; VARIETY</div>'
-      + '<div class="st-row"><span>39.20%</span><span>90%</span><span>Turf-Type Tall Fescue <em>(named cultivar)</em></span><span class="st-anno good">↤ names the cultivar ✓</span></div>'
-      + '<div class="st-row"><span>29.40%</span><span>90%</span><span>Turf-Type Tall Fescue <em>(named cultivar)</em></span></div>'
-      + '<div class="st-row"><span>19.60%</span><span>85%</span><span>Kentucky Bluegrass <em>(named cultivar)</em></span><span class="st-anno good">↤ a blend of 3+ ✓</span></div>'
+      + '<div class="st-h">PURE SEED &nbsp;&nbsp; VARIETY &nbsp;&nbsp; GERM &nbsp;&nbsp; ORIGIN</div>'
+      + '<div class="st-row"><span>49.11%</span><span>90%</span><span>ABC Tall Fescue &nbsp;&middot; OR</span><span class="st-anno good">↤ names the cultivar ✓</span></div>'
+      + '<div class="st-row"><span>34.63%</span><span>85%</span><span>LMP Tall Fescue &nbsp;&middot; OR</span></div>'
+      + '<div class="st-row"><span>9.95%</span><span>90%</span><span>TUV Tall Fescue &nbsp;&middot; OR</span><span class="st-anno good">↤ a blend of 3+ cultivars ✓</span></div>'
+      + '<div class="st-row"><span>4.94%</span><span>85%</span><span>XYZ Kentucky Bluegrass &nbsp;&middot; ID</span></div>'
     + '</div>'
     + '<div class="st-section">'
-      + '<div class="st-row2"><span>OTHER CROP</span><span>0.01%</span><span class="st-anno good">↤ near zero ✓</span></div>'
-      + '<div class="st-row2"><span>INERT MATTER</span><span>9.79%</span><span class="st-anno">↤ filler/coating — lower is better</span></div>'
+      + '<div class="st-row2"><span>OTHER CROP</span><span>0.00%</span><span class="st-anno good">↤ zero ✓</span></div>'
       + '<div class="st-row2"><span>WEED SEED</span><span>0.00%</span><span class="st-anno good">↤ zero ✓</span></div>'
+      + '<div class="st-row2"><span>INERT MATTER</span><span>1.37%</span><span class="st-anno good">↤ low (under 2%) ✓</span></div>'
       + '<div class="st-row2"><span>NOXIOUS WEEDS</span><span>NONE FOUND</span><span class="st-anno good">↤ what you want ✓</span></div>'
     + '</div>'
     + '<div class="st-section">'
-      + '<div class="st-row2"><span>TEST DATE</span><span>02/2026</span><span class="st-anno good">↤ within 12 months ✓</span></div>'
-      + '<div class="st-row2"><span>NET WEIGHT</span><span>7 LBS</span><span class="st-anno">↤ bag weight (not all seed if coated)</span></div>'
+      + '<div class="st-row2"><span>TEST DATE</span><span>11/2025</span><span class="st-anno good">↤ within 12 months ✓</span></div>'
+      + '<div class="st-row2"><span>NET WEIGHT</span><span>50 LBS</span><span class="st-anno">↤ bag weight (not all seed if coated)</span></div>'
     + '</div>'
-    + '<div class="st-foot">Lot No. · Seller name &amp; address · Origin state'
+    + '<div class="st-foot">Seed Company &middot; Any Street &middot; Anywhere, USA 00000'
       + '<div class="st-anno bad" style="margin-top:6px;">Also scan for: "Kentucky 31 / K-31" or "annual ryegrass" in the variety list — avoid both ✕</div>'
       + '<div class="st-anno good" style="margin-top:3px;">A <strong>blue tag</strong> on the bag = certified variety authenticity ✓</div>'
     + '</div>'
@@ -708,9 +840,13 @@ function showDiag(key, btn){
   var opts = document.querySelectorAll('#diag-opts .diag-opt');
   opts.forEach(function(o){ o.classList.remove('selected'); });
   if (btn) btn.classList.add('selected');
+  // Pest and weeds entries also reference the Pest Management Guide; add that to citations when applicable.
+  var srcKeys = (key === 'pest' || key === 'weeds')
+    ? ['430-520','emg-11','456-018']
+    : ['430-520','emg-11'];
   document.getElementById('diag-result').innerHTML =
     '<div class="diag-answer"><strong>Likely cause: ' + d.cause + '</strong><br>' + d.fix
-    + '<br><span class="src">Fix this before you reseed, or the new grass may fail the same way. (VCE 430-520; EMG Handbook chapter 11)</span></div>';
+    + '<br><span class="src">Fix this before you reseed, or the new grass may fail the same way' + citeMulti(srcKeys) + '.</span></div>';
 }
 
 function updateBuy(key){
@@ -718,9 +854,23 @@ function updateBuy(key){
   var area = parseFloat(document.getElementById('seed-area').value) || 0;
   var rate = (answers.project==='overseed'||answers.project==='patch') ? sp.rateOver : sp.rateNew;
   var out = document.getElementById('buy-out');
+
+  // Multipliers per VCE Agronomy Handbook Part III (SPES-299P), Table 1, and UMD Extension PLS conversion.
+  // Base rate is for hulled, uncoated seed, stated in pure live seed (PLS).
+  // Unhulled bermudagrass: VCE Table 1 lists 5-10 lbs PLS/1,000 sq ft vs. 1-2 lbs for hulled — a 5x increase.
+  // Coated seed: VCE doesn't address coating directly. UMD Extension's PLS-to-bag-weight formula
+  // (lb. PLS recommended / (% germination * % purity) = lb. of seed to plant) implies that a coated bag,
+  // whose coating counts as inert matter and reduces purity, needs more bag weight to deliver the same PLS.
+  // A 2x multiplier is used here as a typical estimate for retail coated bags.
+  var mult = 1;
+  var hullSel = document.querySelector('input[name="hull"]:checked');
+  if (hullSel && hullSel.value === 'unhulled') mult *= 5;
+  var coatSel = document.querySelector('input[name="coat"]:checked');
+  if (coatSel && coatSel.value === 'coated') mult *= 2;
+
   if (area > 0){
-    var lo = Math.round(rate[0] * area / 1000 * 10)/10;
-    var hi = Math.round(rate[1] * area / 1000 * 10)/10;
+    var lo = Math.round(rate[0] * area / 1000 * mult * 10)/10;
+    var hi = Math.round(rate[1] * area / 1000 * mult * 10)/10;
     out.textContent = (lo===hi ? lo : (lo + '-' + hi)) + ' lbs of seed';
   } else { out.textContent = '— lbs'; }
 }
