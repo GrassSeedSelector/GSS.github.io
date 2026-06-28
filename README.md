@@ -16,10 +16,11 @@ A Virginia homeowner walks into a big-box store, stares at a wall of seed bags, 
 
 - 🌾 **A grass recommendation** matched to their region, sunlight, use, and maintenance level — powered by VCE SPES-748 logic
 - 🛒 **What to look for on the bag** — a brand-free checklist that teaches how to read a real seed analysis tag
-- 📐 **How much to buy** — enter the lawn area, get the pounds
+- 📐 **How much to buy** — enter the lawn area, get the pounds. For warm-season seed (bermudagrass, centipedegrass), hulled/unhulled and coated/uncoated toggles adjust the calculation per VCE Agronomy Handbook Part III (SPES-299P) and the UMD pure live seed conversion formula
 - 📅 **When to plant** — species-specific timing windows
 - 🔍 **Renovation diagnosis** (for overseed/patch projects) — interactive troubleshooter: tap the symptom, get the VCE fix
 - 🌼 **Lawn alternative path** — for sites where a native groundcover beats turf
+- 📚 **Numbered footnotes and a Sources block** — every claim is footnoted to a numbered superscript that links to the Sources section at the bottom of the recommendation. Only sources actually cited in that recommendation appear in its Sources block
 
 ---
 
@@ -63,10 +64,10 @@ A Virginia homeowner walks into a big-box store, stares at a wall of seed bags, 
 
 | Grass | Best for | Region limit | Seeded? |
 | :-- | :-- | :-- | :-- |
-| **Zoysiagrass** | Dense, drought-tough lawns | Piedmont + Coast | Some types |
-| **Bermudagrass** | High-traffic, full-sun lawns | Piedmont + Coast | Yes |
+| **Zoysiagrass** | Dense, drought-tough lawns | Piedmont and Coast | Some types |
+| **Bermudagrass** | High-traffic, full-sun lawns | Piedmont and Coast | Common types only (hybrids like Tahoma 31, TifTuf, Latitude 36 are sod or sprigs) |
 | **Centipedegrass** | Lowest-input warm-season | Far south only | Yes |
-| **St. Augustinegrass** | Shade-tolerant warm-season | SE coast only | No — sod/plugs |
+| **St. Augustinegrass** | Shade-tolerant warm-season | SE coast only | No — sod or plugs |
 
 ---
 
@@ -78,12 +79,19 @@ The heart of the tool. Instead of recommending a brand, it teaches the homeowner
 - 🏷️ **Blue certification tag** — certifies varietal authenticity
 - ✅ **Named cultivars** — not just the species
 - 🔬 **Germination 85%+** with a test date within 12 months
-- ⚖️ **Pure Live Seed** — the real comparison metric between two bags
+- ⚖️ **Pure Live Seed** — the real comparison metric between two bags; conversion formula from UMD Extension
 - 🧪 **Low inert matter**, near-zero weed seed
 - ⚠️ **Avoid** Kentucky 31 (pasture grass) and annual ryegrass (dies in a year)
 - 🎨 **Coated-seed trap** — coating adds bag weight that isn't seed
 
-A **brand-free sample seed tag** with annotated green/red callouts shows exactly what each line means.
+A **sample seed tag modeled on VCE Agronomy Handbook Part III** (SPES-299P, page 80) with annotated green and red callouts shows exactly what each line means.
+
+### Warm-season seed (bermudagrass, centipedegrass) — extra label items
+
+Warm-season seed adds two label considerations cool-season seed doesn't have:
+
+- 🌾 **Hulled or unhulled** (bermudagrass only) — bermudagrass seed is sold in three forms (hulled, unhulled, hulled-and-clay-coated). Hulled germinates faster and is the typical spring or summer choice; unhulled is sometimes used for late-fall or winter dormant seeding. The VCE seeding rate for unhulled is roughly five times higher (sources: NC State AG-493 for the three forms; TAMU AgriLife for the planting biology; VCE SPES-299P Table 1 for the rates)
+- 🧱 **Coating is much heavier** than on cool-season seed — clay coating is added for easier broadcasting (NC State AG-493) and shows up on the tag as inert matter; for warm-season seed, the inert-matter percentage is the figure to watch
 
 ---
 
@@ -108,7 +116,7 @@ When the user picks "Replacing lawn with a groundcover," the tool skips the gras
 
 ## 🖨️ Print
 
-The "Print my shopping list" button produces a clean one- to two-page printout: just the recommendation card, bag checklist, and seed quantity — ready to take to the store.
+The "Print my shopping list" button produces a clean one- to two-page printout: the recommendation card, bag checklist, seed quantity, planting window, and the numbered Sources block — ready to take to the store, with full source attribution preserved.
 
 ---
 
@@ -128,18 +136,32 @@ The tool covers five regions, defaulting to Southern Piedmont (Chesterfield, Gre
 
 ## 📖 Sources
 
-All recommendations trace to Virginia Cooperative Extension publications:
+Every fact-bearing claim in the rendered recommendation is footnoted to a numbered superscript and listed in a Sources block at the end. Virginia Cooperative Extension sources are primary; land-grant cooperator sources are used only where VCE does not cover the topic, per the Chesterfield Help Desk Source Guidelines (April 2026).
 
-| Publication | Title |
-| :-- | :-- |
-| SPES-748 | "Selecting Turfgrass for Virginia" |
-| SPES-617 | "Virginia Turfgrass Variety Recommendations" (updated yearly) |
-| 430-520 | "Fall Lawn Care" |
-| 430-522 | Maintenance Calendar for Warm-Season Turfgrasses |
-| 430-523 | Maintenance Calendar for Cool-Season Turfgrasses |
-| 426-609 | "Selecting Landscape Plants: Groundcovers" |
-| EMG Handbook Ch. 11 | Lawn Establishment and Renovation |
-| 456-018 | Pest Management Guide: Home Grounds & Animals |
+### Virginia Cooperative Extension (primary)
+
+| Publication | Title | Used for |
+| :-- | :-- | :-- |
+| SPES-748 | "Selecting Turfgrass for Virginia" | Species properties, recommendation logic |
+| SPES-299P / 424-100-C | "Agronomy Handbook Part III: Turfgrass" (Goatley, Hardiman, Chalmers, Whitt) | Per-species seeding rates in pure live seed (Table 1); seed-tag literacy; blue tag certification; Kentucky 31 and annual ryegrass cautions; sample seed tag (page 80) |
+| SPES-617 / SPES-727 | "Virginia Turfgrass Variety Recommendations" (updated yearly) | Certified-cultivar backstop |
+| 430-520 / SPES-223P | "Fall Lawn Care" | Renovation diagnostic framework |
+| 430-522 / SPES-669P | Maintenance Calendar for Warm-Season Turfgrasses | Warm-season timing |
+| 430-523 / SPES-670P | Maintenance Calendar for Cool-Season Turfgrasses | Cool-season timing |
+| 426-609 | "Selecting Landscape Plants: Groundcovers" | Lawn-alternative path |
+| 418-040 | "Sod Source Selection, Installation, Maintenance, and Producers in Virginia" (Goatley) | Sod and plug shopping guidance (St. Augustinegrass) |
+| EMG Handbook chapter 11 | Lawn Establishment and Renovation | Diagnostic causes, plug spacing |
+| 456-018 / ENTO-634P | Pest Management Guide: Home Grounds and Animals | Pesticide and herbicide product selection (label governs rate and timing) |
+
+### Land-Grant Extension Cooperators
+
+Used only where VCE does not directly cover the topic. Preferred-tier hierarchy: VCE → NC State → Clemson → UMD → Rutgers → Penn State → other universities.
+
+| Source | Used for | Tier |
+| :-- | :-- | :-- |
+| NC State Extension publication AG-493, "Bermudagrass Production in North Carolina" | Existence of hulled, unhulled, and clay-coated bermudagrass seed forms; the purpose of clay coating (a broadcasting aid) | Preferred — NC State (climate-appropriate for Chesterfield County) |
+| University of Maryland Extension publication FS759 | Pure live seed conversion formula: lb. PLS recommended ÷ (% germination × % purity) = lb. of seed to plant | Preferred — UMD |
+| Texas A&M AgriLife Extension Aggie Horticulture, "Bermudagrass" | Hulled-vs-unhulled planting biology (hulled for spring and summer; unhulled for late-fall and winter dormant seeding) | "Other universities" — used because no preferred-tier source articulates the timing distinction; biology is climate-independent, and Virginia planting windows come from VCE Agronomy Handbook Part III, Table 2 |
 
 ---
 
@@ -149,7 +171,9 @@ All recommendations trace to Virginia Cooperative Extension publications:
 - **No external dependencies** except Google Fonts CDN (Fraunces, Newsreader, IBM Plex Mono)
 - **No backtick template literals** — string concatenation only (Safari compatibility)
 - **No brand names** anywhere in the code or output
-- **Print stylesheet** included; interactive elements stripped in print
+- **No commercial seed-seller or trade-publication sources** anywhere in the rendered content, per the Chesterfield Help Desk Source Guidelines (April 2026)
+- **Numbered footnote system** — a `SOURCES` master citation object plus `cite()` and `citeMulti()` helpers insert numbered superscript links and record use in a `citedOrder` array; `renderSourcesBlock()` builds a Sources section at the end of each recommendation listing only the sources actually cited
+- **Print stylesheet** included; interactive elements stripped in print; the Sources block prints alongside the rest
 - **Responsive** — single-column layout on all screen widths
 
 ---
