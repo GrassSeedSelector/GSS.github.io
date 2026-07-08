@@ -9,11 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f3f1e9; --card:#ffffff; --ink:#21302a; --slate:#52605a; --slate-light:#8a948e;
+    --bg:#f3f1e9; --card:#ffffff; --ink:#21302a; --slate:#52605a;
+    /* --slate-light darkened from the original #8a948e (~2.8:1 on --bg) to meet WCAG 1.4.3 (4.5:1) for hint/footnote text */
+    --slate-light:#5c655f;
     --green-deep:#2c5f3e; --green:#3d8b5f; --green-soft:#e7f1ea;
-    --gold:#b8862f; --gold-soft:#f8efda; --terracotta:#bb5a3c; --terra-soft:#f6e3da;
+    /* --gold darkened from the original #b8862f (~3.2:1 with white text) to meet 4.5:1 for button/table-header text */
+    --gold:#8a6418; --gold-soft:#f8efda;
+    --terracotta:#bb5a3c; --terracotta-text:#8a3d26; --terra-soft:#f6e3da;
     --sky:#33688f; --sky-soft:#e4eef5; --border:#e0ddd0; --rule:#cfd8d0;
   }
+  .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;}
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{margin:0; background:var(--bg); color:var(--ink); font-family:'Newsreader',Georgia,serif;
@@ -22,7 +28,7 @@
 
   header.hero{padding:54px 0 30px; border-bottom:3px double var(--green-deep); margin-bottom:30px;}
   .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.22em;
-    text-transform:uppercase; color:var(--green); margin:0 0 12px;}
+    text-transform:uppercase; color:var(--green-deep); margin:0 0 12px;}
   h1{font-family:'Fraunces',serif; font-weight:600; font-size:clamp(1.9rem,5vw,2.9rem);
     line-height:1.05; letter-spacing:-0.01em; margin:0 0 14px; color:var(--green-deep);}
   .lede{font-size:1.1rem; color:var(--slate); margin:0; max-width:60ch;}
@@ -37,7 +43,7 @@
   .qcard{background:var(--card); border:1px solid var(--border); border-radius:14px;
     padding:26px 24px; margin-bottom:18px; box-shadow:0 1px 3px rgba(33,48,42,0.04);}
   .qnum{font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.12em;
-    color:var(--green); margin-bottom:6px;}
+    color:var(--green-deep); margin-bottom:6px;}
   .qtext{font-family:'Fraunces',serif; font-size:1.32rem; font-weight:600; color:var(--green-deep);
     margin:0 0 4px; line-height:1.2;}
   .qhint{font-size:0.9rem; color:var(--slate-light); margin:0 0 18px;}
@@ -56,14 +62,14 @@
   .region-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:6px;}
   select.region{font-family:'Newsreader',serif; font-size:1rem; padding:10px 14px;
     border:1.5px solid var(--border); border-radius:9px; background:var(--card); color:var(--ink); flex:1; min-width:200px;}
-  .region-default{font-size:0.84rem; color:var(--green); font-family:'IBM Plex Mono',monospace;}
+  .region-default{font-size:0.84rem; color:var(--green-deep); font-family:'IBM Plex Mono',monospace;}
 
   .backbtn{background:none; border:none; color:var(--slate-light); font-family:'IBM Plex Mono',monospace;
     font-size:0.78rem; cursor:pointer; padding:8px 0; letter-spacing:0.05em;}
   .backbtn:hover{color:var(--green-deep);}
 
   /* Result */
-  .result-head{font-family:'Fraunces',serif; font-size:1.0rem; color:var(--green); margin:0 0 4px;
+  .result-head{font-family:'Fraunces',serif; font-size:1.0rem; color:var(--green-deep); margin:0 0 4px;
     letter-spacing:0.02em; text-transform:uppercase; font-weight:600;}
   .pick{font-family:'Fraunces',serif; font-size:2rem; font-weight:600; color:var(--green-deep);
     line-height:1.1; margin:0 0 8px;}
@@ -94,7 +100,7 @@
     border:1px solid var(--border); background:var(--card);}
   .note .nt{font-weight:600; font-family:'Fraunces',serif; display:block; margin-bottom:3px;}
   .note.gold{background:var(--gold-soft); border-color:#ecd9ad;} .note.gold .nt{color:#8a6418;}
-  .note.terra{background:var(--terra-soft); border-color:#eccabc;} .note.terra .nt{color:var(--terracotta);}
+  .note.terra{background:var(--terra-soft); border-color:#eccabc;} .note.terra .nt{color:var(--terracotta-text);}
   .note.green{background:var(--green-soft); border-color:#cfe3d6;} .note.green .nt{color:var(--green-deep);}
   .note.sky{background:var(--sky-soft); border-color:#cbddeb;} .note.sky .nt{color:var(--sky);}
 
@@ -143,8 +149,8 @@
   .st-row2 span:nth-child(2){min-width:74px; font-weight:500;}
   .st-foot{padding:9px 12px; font-size:0.7rem; color:#777; background:#f4f2e8;}
   .st-anno{font-family:'Newsreader',serif; font-size:0.8rem; font-style:italic; color:var(--slate-light);}
-  .st-anno.good{color:var(--green);}
-  .st-anno.bad{color:var(--terracotta);}
+  .st-anno.good{color:var(--green-deep);}
+  .st-anno.bad{color:var(--terracotta-text);}
   .st-brandline .st-anno.good{color:#a8e6c0;}
 
   .buy-amount{font-family:'Fraunces',serif; font-size:1.5rem; color:var(--green-deep); font-weight:600;}
@@ -153,10 +159,11 @@
 
   /* Warm-season seed toggles (hulled / coated) */
   .seed-toggles{margin:12px 0 4px; padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:9px;}
+  fieldset.seed-toggle-row{border:none; padding:0; margin:0 0 8px;}
   .seed-toggle-row{margin-bottom:8px;}
   .seed-toggle-row:last-child{margin-bottom:0;}
-  .seed-toggle-row .stl{font-family:'IBM Plex Mono',monospace; font-size:0.7rem; letter-spacing:0.08em;
-    text-transform:uppercase; color:var(--slate); display:block; margin-bottom:5px;}
+  .seed-toggle-row .stl, legend.stl{font-family:'IBM Plex Mono',monospace; font-size:0.7rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--slate); display:block; margin-bottom:5px; padding:0;}
   .seed-toggle-row label{display:inline-flex; align-items:center; gap:5px; margin-right:14px;
     font-size:0.93rem; color:var(--ink); cursor:pointer;}
   .seed-toggle-row input[type=radio]{cursor:pointer; accent-color:var(--green-deep);}
@@ -164,11 +171,11 @@
   .restart{display:inline-block; margin-top:10px; background:var(--green-deep); color:#f3f1e9;
     border:none; border-radius:9px; padding:12px 22px; font-family:'IBM Plex Mono',monospace;
     font-size:0.82rem; letter-spacing:0.05em; cursor:pointer;}
-  .restart:hover{background:var(--green);}
+  .restart:hover{background:#1f4530;}
   .result-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
   .printbtn{display:inline-block; background:var(--gold); color:#fff; border:none; border-radius:9px;
     padding:12px 22px; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; letter-spacing:0.05em; cursor:pointer;}
-  .printbtn:hover{background:#a0741f;}
+  .printbtn:hover{background:#6b4d12;}
   .print-only{display:none;}
   .print-header{font-family:'Fraunces',serif; font-weight:600; font-size:1.2rem; color:var(--green-deep);
     border-bottom:2px solid var(--green-deep); padding-bottom:8px; margin-bottom:14px;}
@@ -208,22 +215,23 @@
 
   /* Citation footnotes */
   .cite{font-family:'IBM Plex Mono',monospace; font-size:0.68rem; font-weight:500;
-    color:var(--green); text-decoration:none; padding:0 1px; vertical-align:super; line-height:0;}
+    color:var(--green-deep); text-decoration:none; padding:0 1px; vertical-align:super; line-height:0;}
   .cite:hover{color:var(--green-deep); text-decoration:underline;}
   .sources-list{list-style:none; padding:0; margin:8px 0; counter-reset:src;}
   .sources-list li{padding:6px 0 6px 32px; position:relative; font-size:0.88rem;
     color:var(--slate); border-bottom:1px solid var(--border); line-height:1.5;}
   .sources-list li::before{counter-increment:src; content:"[" counter(src) "]";
     position:absolute; left:0; top:6px; font-family:'IBM Plex Mono',monospace;
-    font-size:0.78rem; color:var(--green); font-weight:500;}
+    font-size:0.78rem; color:var(--green-deep); font-weight:500;}
   .sources-list li:last-child{border-bottom:none;}
   .sources-list .src-org{font-weight:500; color:var(--ink);}
   .sources-list a{color:var(--sky); word-break:break-all;}
   footer{padding-top:30px; margin-top:20px; border-top:1px solid var(--rule);
     font-size:0.82rem; color:var(--slate-light);}
   .hidden{display:none;}
-  details{margin:8px 0;} summary{cursor:pointer; color:var(--green); font-size:0.92rem;}
+  details{margin:8px 0;} summary{cursor:pointer; color:var(--green-deep); font-size:0.92rem;}
   @media (max-width:560px){ body{font-size:16px;} header.hero{padding:38px 0 24px;} }
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
 </style>
 </head>
 <body>
@@ -235,11 +243,13 @@
     <p class="lede">Answer a few questions about your site and how you'll use the lawn. You'll get a Virginia-adapted grass recommendation, what to look for on the seed bag at the store, and how much to buy — all from VCE turfgrass guidance.</p>
   </header>
 
-  <div class="progress" id="progress"></div>
+  <main>
+    <div class="progress" id="progress" aria-hidden="true"></div>
 
-  <div id="quiz"></div>
-  <div id="result" class="hidden"></div>
-  <div id="backwrap"></div>
+    <div id="quiz"></div>
+    <div id="result" class="hidden"></div>
+    <div id="backwrap"></div>
+  </main>
 
   <footer>
     Built from VCE sources: SPES-748 "Selecting Turfgrass for Virginia," the Extension Master Gardener Handbook chapter 11, and the lawn maintenance calendars (430-520/522/523). Variety details: VCE SPES-617 (updated yearly). No brands endorsed — your seed bag's label is always the authority.
@@ -302,7 +312,7 @@ function renderSourcesBlock(){
   for (var i = 0; i < citedOrder.length; i++){
     var s = SOURCES[citedOrder[i]];
     html += '<li id="src-' + (i+1) + '"><span class="src-org">' + s.org + ':</span> ' + s.cite;
-    if (s.url) html += ' <a href="' + s.url + '" target="_blank" rel="noopener">' + s.url + '</a>';
+    if (s.url) html += ' <a href="' + s.url + '" target="_blank" rel="noopener">' + s.url + '<span class="sr-only"> (opens in new tab)</span></a>';
     html += '</li>';
   }
   return html + '</ol></div>';
@@ -479,22 +489,22 @@ function renderQuestion(){
   var quiz = document.getElementById('quiz');
   var Q = QUESTIONS[step];
   var html = '<div class="qcard"><div class="qnum">QUESTION ' + (step+1) + ' OF ' + QUESTIONS.length + '</div>'
-    + '<p class="qtext">' + Q.q + '</p><p class="qhint">' + Q.hint + '</p>';
+    + '<h2 class="qtext" id="q-heading" tabindex="-1">' + Q.q + '</h2><p class="qhint">' + Q.hint + '</p>';
 
   if (Q.type === 'region'){
-    html += '<div class="region-row"><select class="region" id="region-select">';
+    html += '<div class="region-row"><select class="region" id="region-select" aria-labelledby="q-heading">';
     REGIONS.forEach(function(r){
       var sel = (r === 'Southern Piedmont') ? ' selected' : '';
       var label = (r === 'Southern Piedmont') ? r + ' — incl. Chesterfield, Greater Richmond area' : r;
       html += '<option value="' + r + '"' + sel + '>' + label + '</option>';
     });
     html += '</select></div>';
-    html += '<div class="opts" style="margin-top:16px;"><button class="opt" onclick="answerRegion()"><span class="emoji">📍</span><span class="otext">Use this region</span></button></div>';
+    html += '<div class="opts" style="margin-top:16px;"><button class="opt" onclick="answerRegion()"><span class="emoji" aria-hidden="true">📍</span><span class="otext">Use this region</span></button></div>';
   } else {
     html += '<div class="opts">';
     Q.opts.forEach(function(o){
       html += '<button class="opt" onclick="answer(\'' + Q.id + '\',\'' + o.v + '\')">'
-        + '<span class="emoji">' + o.e + '</span>'
+        + '<span class="emoji" aria-hidden="true">' + o.e + '</span>'
         + '<span class="otext">' + o.t + (o.s ? '<span class="osub">' + o.s + '</span>' : '') + '</span></button>';
     });
     html += '</div>';
@@ -504,6 +514,11 @@ function renderQuestion(){
 
   var bw = document.getElementById('backwrap');
   bw.innerHTML = (step > 0) ? '<button class="backbtn" onclick="goBack()">← Back</button>' : '';
+
+  // Move focus to the new question so keyboard and screen reader users land here
+  // instead of losing their place when the previous question's button is removed from the DOM.
+  var qHeading = document.getElementById('q-heading');
+  if (qHeading) qHeading.focus();
 }
 
 function answer(id, val){
@@ -560,7 +575,7 @@ function renderResult(){
   var html = '<div class="qcard" id="result-card">'
     + '<div class="print-only print-header">Virginia Lawn Seed Selector &mdash; Shopping List</div>'
     + '<div class="result-head">🌱 Your VCE-adapted recommendation</div>'
-    + '<p class="pick">' + sp.name + '</p>'
+    + '<h2 class="pick" id="result-heading" tabindex="-1">' + sp.name + '</h2>'
     + '<p class="pick-why">' + rec.extra + cite('spes-748') + '</p>';
 
   // Diagnosis reminder for overseed
@@ -581,9 +596,9 @@ function renderResult(){
       + diagBtn('pest','🐛','Spreading dead patches, spots, or chewing')
       + diagBtn('weeds','🌿','Weeds crowded the grass out')
       + '</div>'
-      + '<div id="diag-result"></div>'
+      + '<div id="diag-result" aria-live="polite"></div>'
       + '<details style="margin-top:10px;"><summary>See all causes and VCE fixes</summary>'
-      + '<div class="tbl-scroll"><table class="diag-table"><thead><tr><th>If you see…</th><th>Likely cause</th><th>VCE fix before reseeding</th></tr></thead><tbody>'
+      + '<div class="tbl-scroll"><table class="diag-table"><thead><tr><th scope="col">If you see…</th><th scope="col">Likely cause</th><th scope="col">VCE fix before reseeding</th></tr></thead><tbody>'
       + diagRow('shade') + diagRow('traffic') + diagRow('drainage') + diagRow('thatch')
       + diagRow('soil') + diagRow('drought') + diagRow('pest') + diagRow('weeds')
       + '</tbody></table></div></details>'
@@ -654,22 +669,23 @@ function renderResult(){
   if (isSeed){
     html += '<div class="resblock"><h3>📐 How much to buy</h3>'
       + '<p>Enter your area to size the bag:</p>'
-      + '<p><input type="number" class="area-input" id="seed-area" placeholder="sq. ft." oninput="updateBuy(\'' + rec.key + '\')"> sq. ft. &nbsp;→&nbsp; <span class="buy-amount" id="buy-out">— lbs</span></p>';
+      + '<p><label for="seed-area" class="sr-only">Lawn area in square feet</label>'
+      + '<input type="number" class="area-input" id="seed-area" placeholder="sq. ft." oninput="updateBuy(\'' + rec.key + '\')"> sq. ft. &nbsp;→&nbsp; <span class="buy-amount" id="buy-out" aria-live="polite">— lbs</span></p>';
 
     if (sp.season === 'warm'){
       // Warm-season seed has heavy coating and (for bermuda) a hulled/unhulled choice that materially changes bag weight.
       // Default each toggle to the more common retail scenario so the displayed figure matches what a homeowner most likely buys.
       html += '<div class="seed-toggles">';
       if (sp.hasHulling){
-        html += '<div class="seed-toggle-row"><span class="stl">Hulled or unhulled?</span>'
+        html += '<fieldset class="seed-toggle-row"><legend class="stl">Hulled or unhulled?</legend>'
           + '<label><input type="radio" name="hull" value="hulled" checked onchange="updateBuy(\'' + rec.key + '\')"> Hulled (faster germination — typical at retail)</label>'
           + '<label><input type="radio" name="hull" value="unhulled" onchange="updateBuy(\'' + rec.key + '\')"> Unhulled (slower, more forgiving — VCE rate is about 5 times higher)</label>'
-          + '</div>';
+          + '</fieldset>';
       }
-      html += '<div class="seed-toggle-row"><span class="stl">Coated or uncoated?</span>'
+      html += '<fieldset class="seed-toggle-row"><legend class="stl">Coated or uncoated?</legend>'
         + '<label><input type="radio" name="coat" value="uncoated" checked onchange="updateBuy(\'' + rec.key + '\')"> Uncoated (raw seed)</label>'
         + '<label><input type="radio" name="coat" value="coated" onchange="updateBuy(\'' + rec.key + '\')"> Coated (clay coating — most retail bags; roughly doubles needed bag weight)</label>'
-        + '</div>'
+        + '</fieldset>'
         + '</div>'
         + '<p class="src" style="margin-top:8px;">⚖️ Base rates come from VCE Agronomy Handbook Part III, Table 1' + cite('spes-299p') + ': ' + (sp.hasHulling ? '1-2 lbs per 1,000 sq ft for hulled bermudagrass, 5-10 lbs for unhulled' : '0.25-0.5 lbs per 1,000 sq ft for centipedegrass') + ', stated in <strong>pure live seed</strong>. The VCE table doesn\'t adjust for coating, but because the underlying rate is in PLS, a coated bag (where coating reduces purity, hence PLS) needs more bag weight to deliver the same PLS. The "Coated" setting here doubles the listed pounds as a typical estimate; for precision, compute the actual conversion from your bag\'s tag using the formula <code>lb. PLS recommended &divide; (% germination &times; % purity) = lb. of seed to plant</code>' + cite('umd-pls') + '.</p>';
     } else {
@@ -702,6 +718,8 @@ function renderResult(){
 
   R.innerHTML = html;
   R.scrollIntoView({behavior:'smooth', block:'start'});
+  var resultHeading = document.getElementById('result-heading');
+  if (resultHeading) resultHeading.focus();
 }
 
 // ---- Lawn-alternative / native groundcover path (VCE 426-609; EMG Handbook Ch. 11; VA Master Gardener guidance) ----
@@ -716,7 +734,7 @@ function renderAlternative(){
   var html = '<div class="qcard" id="result-card">'
     + '<div class="print-only print-header">Virginia Lawn Alternatives &mdash; Groundcovers</div>'
     + '<div class="result-head">🌼 Replacing lawn with a groundcover</div>'
-    + '<p class="pick" style="font-size:1.6rem;">A groundcover may be the better choice</p>'
+    + '<h2 class="pick" id="result-heading" tabindex="-1" style="font-size:1.6rem;">A groundcover may be the better choice</h2>'
     + '<p class="pick-why">VCE agrees that in some sites a groundcover beats turf — its lawn guidance states that where grass struggles, "alternative ground covers are a better option than turf." Groundcovers cover bare soil, cut erosion, need far less mowing, and provide habitat for pollinators and other wildlife. (VCE 426-609; EMG Handbook chapter 11)</p>';
 
   // When it makes sense
@@ -744,7 +762,7 @@ function renderAlternative(){
 
   // Native examples
   html += '<div class="resblock"><h3>🌿 Matching natives to the site</h3>'
-    + '<p>The right plant depends on the spot\'s light and moisture. One VCE-cited example: in <strong>dry shade where turf won\'t grow</strong>, Pennsylvania sedge (<em>Carex pensylvanica</em>) is a native option. '
+    + '<p>The right plant depends on the spot\'s light and moisture. One VCE-cited example: in <strong>dry shade where turf won\'t grow</strong>, Pennsylvania sedge (<em lang="la">Carex pensylvanica</em>) is a native option. '
     + 'For a fuller set of choices matched to sun, shade, and moisture, use the curated native-plant lists in the resources below rather than a single example here.</p>'
     + '<p class="src">Match any choice to your specific conditions, and confirm it\'s native and non-invasive before planting.</p></div>';
 
@@ -772,6 +790,8 @@ function renderAlternative(){
 
   R.innerHTML = html;
   R.scrollIntoView({behavior:'smooth', block:'start'});
+  var resultHeading = document.getElementById('result-heading');
+  if (resultHeading) resultHeading.focus();
 }
 
 function prop(label, val){
@@ -829,7 +849,7 @@ var DIAG = {
 };
 
 function diagBtn(key, emoji, text){
-  return '<button class="diag-opt" onclick="showDiag(\'' + key + '\', this)"><span class="emoji">' + emoji + '</span><span>' + text + '</span></button>';
+  return '<button class="diag-opt" aria-pressed="false" onclick="showDiag(\'' + key + '\', this)"><span class="emoji" aria-hidden="true">' + emoji + '</span><span>' + text + '</span></button>';
 }
 function diagRow(key){
   var d = DIAG[key];
@@ -838,8 +858,8 @@ function diagRow(key){
 function showDiag(key, btn){
   var d = DIAG[key];
   var opts = document.querySelectorAll('#diag-opts .diag-opt');
-  opts.forEach(function(o){ o.classList.remove('selected'); });
-  if (btn) btn.classList.add('selected');
+  opts.forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-pressed','false'); });
+  if (btn){ btn.classList.add('selected'); btn.setAttribute('aria-pressed','true'); }
   // Pest and weeds entries also reference the Pest Management Guide; add that to citations when applicable.
   var srcKeys = (key === 'pest' || key === 'weeds')
     ? ['430-520','emg-11','456-018']
